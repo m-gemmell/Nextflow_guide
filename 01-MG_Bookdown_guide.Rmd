@@ -1,0 +1,210 @@
+---
+title: "MG Bookdown Guide"
+author: "Matthew R. Gemmell"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+favicon: figures/NEOF_favicon.png
+description: NEOF book for the Introduction to command line bioinformatics workshop
+cover-image: "figures/NEOF.png"
+---
+
+```{r cite-packages, include = FALSE}
+# automatically create a bib database for R packages
+# add any packages you want to cite here
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'webexercises', 'qmethod'
+), 'packages.bib')
+```
+
+# MG Bookdown Guide
+
+This is a quick and dirty guide on how I use bookdown. It is primarily for my use but if someone else finds it I hope it will also proof useful. Additionally, this was made with R Bookdown.
+
+## Intro
+
+R bookdown uses Rmarkdown. First learn some Rmarkdown then learn bookdown. SOme useful links are below.
+
+-   R bookdown website: <https://bookdown.org/>
+-   R bookdown book: <https://bookdown.org/yihui/bookdown/>
+-   Cheatsheets to find r markdown cheatsheet: <https://rstudio.com/resources/cheatsheets/>
+-   Minimal bookdown template: <https://github.com/rstudio/bookdown-demo>
+
+I generally write and do everything in RStudio.
+
+`F7` to spell check in rstudio
+
+## Create bookdown html
+
+Set working directory to directory with all the r markdowns.
+
+Change name to the file name that starts with 01 or the index file if you have it.
+
+```{r, eval=FALSE}
+bookdown::render_book("01-XX.Rmd", "bookdown::gitbook")
+```
+
+HTMLS found in "\_book" directory Need to run render_book command to update any changes
+
+Easiest way I find is to have 1 page per chapter File names need to start with a number to show order 01-, 02-, 03- etc
+
+## YAML files
+
+You will need to edit some YAML files
+
+-   `_bookdown.yml` : Good to change the "book_filename:"
+-   `_output.yml` : Good to change the "before:" text to what you want.
+    -   I turn off a lot of things so readers do not have a lot of buttons I don't want them to have
+        -   I set "split_by:" set to "rmd" so there is a html page for each rmd file.
+
+**More info**:
+
+-   <https://bookdown.org/yihui/bookdown/output-formats.html>
+-   <https://bookdown.org/yihui/bookdown/yaml-options.html>
+-   <https://bookdown.org/yihui/rmarkdown/bookdown-output.html>
+
+## Web exercises
+
+The R package [`webexercises`](https://github.com/PsyTeachR/webexercises) is useful to include MCQs and other functions in your bookdown.
+
+You will need to initialise this which is below the MCQ and expand example. For more functions please see the following [page](https://psyteachr.github.io/webexercises/).
+
+### MCQ example
+
+Example code chunk:
+
+````{verbatim}
+```{r, echo = FALSE}
+opts_p <- c("__A1__", "__A2__", answer="__A3__")
+```
+1. Question? `r longmcq(opts_p)`
+````
+
+```{r, echo = FALSE}
+opts_p <- c("__A1__", "__A2__", answer="__A3__")
+```
+1. Question? `r longmcq(opts_p)`
+
+### template
+````{verbatim}
+```{r, eval = FALSE}
+opts_p <- c("__ __", "__ __", "__ __")
+```
+`r longmcq(opts_p)`
+````
+
+
+### Expandable help box example
+
+```{r, eval=FALSE}
+`r hide("Title")`
+Contents
+`r unhide()`
+```
+
+`r hide("Title")` Contents `r unhide()`
+
+## Initalising
+
+You first need to add web exerices to your bookdown (only needs doing once).
+
+Run below in your bookdown dir
+
+```{r, eval=FALSE}
+library("webexercises")
+add_to_bookdown(bookdown_dir = ".",
+                include_dir = "www",
+                script_dir = "scripts",
+                output_format = "gitbook")
+```
+
+If like me you don't use an index.rmd file and instead use your "01-XX.Rmd" as the first page you will need to delete the resulting "index.rmd" file. Then you need to add in the below to your "01-XX.RMD" file just below the block with the title, author etc.
+
+<strong>`{r cite-packages, include = FALSE} # automatically create a bib database for R packages # add any packages you want to cite here knitr::write_bib(c(   .packages(), 'bookdown', 'webexercises' ), 'packages.bib')`</strong>
+
+To make the MCQs have nice boxes around the text change the webex-radiogroup label to the below. This is found in ./www/webex.css
+
+```{css, eval=FALSE}
+.webex-radiogroup label {
+  /*Text colour*/
+  color: : #aaaaaa;
+  margin-left: 2em;
+  margin-bottom: 0.25em;
+  text-indent: -1em;
+  padding-left: 0.5em;
+  font-weight: 400;
+  display: block;
+  /*Set border of text to solid and dark grey*/
+  border: 2px solid #1d1d1d;
+  border-radius: 0.25em;
+  /*Set colour in box to white so works for every bookdown colour scheme*/
+  background: white;
+}
+```
+
+## Embed YouTube URLS
+
+Handy guide: <https://www.h3xed.com/web-development/how-to-make-a-responsive-100-width-youtube-iframe-embed>
+
+Add the following to your style.css
+
+```{css, eval=FALSE}
+.container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+}
+.video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+```
+
+Add the following code to where you want the URL to be embedded. Change the link to the embed link of your video.
+
+```{css, eval=TRUE}
+<div class="container">
+<iframe src="https://www.youtube.com/embed/U_RkeDVU2cg" 
+frameborder="0" allowfullscreen class="video"></iframe>
+</div>
+```
+
+<div class="container">
+<iframe src="https://www.youtube.com/embed/U_RkeDVU2cg" 
+frameborder="0" allowfullscreen class="video"></iframe>
+</div>
+
+## style.css code to make page wider
+
+Add code to your bookdown's "style.css" file
+
+```{css, eval=FALSE}
+.book .book-body .page-wrapper .page-inner {
+  max-width: 1000px !important;
+}
+```
+
+## Create one page html book
+
+Add the following to \_output.yml
+
+```{css, eval=FALSE}
+bookdown::html_book:
+  split_by: none
+  css: style.css
+  toc: false
+```
+
+Run the following command in the book dir to render
+
+```{r, eval=FALSE}
+bookdown::render_book("01-XX.Rmd", "bookdown::html_book", output_dir = "one_file_book")
+```
