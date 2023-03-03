@@ -171,6 +171,57 @@ To make the MCQs have nice boxes around the text change the webex-radiogroup lab
 }
 ```
 
+## Icons
+
+You can use Icons in your bookdown: https://github.com/mitchelloharawild/icons
+
+__Note__: You will only be able to use free icons.
+
+### Fontawesome
+
+The below code can be used to add `r icons::fontawesome("rocket", style="solid")`.
+
+```{r, eval=FALSE}
+`r icons::fontawesome("rocket", style="solid")`
+```
+
+### Ionicons
+
+The below code can be used to add `r icons::ionicons("calculator")`.
+```{r, eval=FALSE}
+`r icons::ionicons$calculator`
+```
+
+### Bioicons
+
+The below code can be used to add `r icons::bioicons("dna-7")`.
+```{r, eval=FALSE}
+`r icons::bioicons$dna-7`
+```
+
+### Search pages
+
+- [Fontawesome](https://fontawesome.com/search)
+- [Ionicons](https://ionic.io/ionicons)
+- [Bioicons](https://bioicons.com/)
+
+### Installing icons
+
+You only need to do the following once in your version of R
+
+```{r, eval=FALSE}
+#Install library
+install.packages("remotes")
+remotes::install_github("mitchelloharawild/icons")
+#You will also need to download icons
+#fontawesome
+icons::download_fontawesome()
+#Ion icons
+icons::download_ionicons()
+#Bioincons
+icons::download_bioicons()
+```
+
 ## Embed YouTube URLS
 
 Handy guide: <https://www.h3xed.com/web-development/how-to-make-a-responsive-100-width-youtube-iframe-embed>
