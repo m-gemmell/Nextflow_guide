@@ -52,6 +52,24 @@ HTMLS found in "\_book" directory Need to run render_book command to update any 
 
 Easiest way I find is to have 1 page per chapter File names need to start with a number to show order 01-, 02-, 03- etc
 
+## Section part
+
+To create a section part you can add the following to the top of a page.
+
+```{r , eval = FALSE}
+# (PART\*) Name {-}
+```
+
+## Appendix
+
+You can create an appendix from one or multiple pages.
+
+Ensure the first page of your appendix has the following at the top:
+
+```{r, eval=FALSE}
+# (APPENDIX) Appendix {-}
+```
+
 ## YAML files
 
 You will need to edit some YAML files
@@ -97,7 +115,6 @@ opts_p <- c("__ __", "__ __", "__ __")
 `r longmcq(opts_p)`
 ````
 
-
 ### Expandable help box example
 
 ```{r, eval=FALSE}
@@ -108,7 +125,7 @@ Contents
 
 `r hide("Title")` Contents `r unhide()`
 
-## Initalising
+### Initalising
 
 You first need to add web exerices to your bookdown (only needs doing once).
 
@@ -124,7 +141,15 @@ add_to_bookdown(bookdown_dir = ".",
 
 If like me you don't use an index.rmd file and instead use your "01-XX.Rmd" as the first page you will need to delete the resulting "index.rmd" file. Then you need to add in the below to your "01-XX.RMD" file just below the block with the title, author etc.
 
-<strong>`{r cite-packages, include = FALSE} # automatically create a bib database for R packages # add any packages you want to cite here knitr::write_bib(c(   .packages(), 'bookdown', 'webexercises' ), 'packages.bib')`</strong>
+````{verbatim}
+```{r cite-packages, include = FALSE}
+# automatically create a bib database for R packages
+# add any packages you want to cite here
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'webexercises'
+), 'packages.bib')
+```
+````
 
 To make the MCQs have nice boxes around the text change the webex-radiogroup label to the below. This is found in ./www/webex.css
 
