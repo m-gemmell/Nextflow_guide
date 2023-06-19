@@ -208,35 +208,64 @@ __Note__: You will only be able to use free icons.
 
 The below code can be used to add `r icons::fontawesome("rocket", style="solid")`.
 
-```{r, eval=FALSE}
-`r icons::fontawesome("rocket", style="solid")`
+````{verbatim}
+```{r, echo=FALSE}
+icons::fontawesome("rocket", style="solid")
 ```
+````
+
+To add to text do like so:
+
+````{verbatim}
+A compass (
+```{r, echo=FALSE}
+icons::fontawesome("compass", style="solid")
+```
+) is useful to find north.
+````
+
+This will produce:
+
+A compass (
+```{r, echo=FALSE}
+icons::fontawesome("compass", style="solid")
+```
+) is useful to find north.
 
 ### Ionicons
 
 The below code can be used to add `r icons::ionicons("calculator")`.
-```{r, eval=FALSE}
-`r icons::ionicons$calculator`
+
+````{verbatim}
+```{r, echo=FALSE}
+icons::ionicons("calculator")
 ```
+````
 
 ### Bioicons
 
 The below code can be used to add `r icons::bioicons("dna-7")`.
-```{r, eval=FALSE}
-`r icons::bioicons$dna-7`
+
+````{verbatim}
+```{r, echo=FALSE}
+icons::bioicons("dna-7")
 ```
+````
 
 ### Searching
 
-You can search for the code for an icon like so:
-
-```{r, eval=FALSE}
-icon_find("rocket")
-```
+Search for your icons via the following websites:
 
 - [Fontawesome](https://fontawesome.com/search)
 - [Ionicons](https://ionic.io/ionicons)
 - [Bioicons](https://bioicons.com/)
+
+You can check if the name will work with:
+
+```{r, eval=FALSE}
+library("icons")
+icon_find("rocket")
+```
 
 ### Installing icons
 
