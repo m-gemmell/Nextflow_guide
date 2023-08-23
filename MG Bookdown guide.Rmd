@@ -348,6 +348,32 @@ Chaning the `@media` from the default 1240px to 1440px fixed an issue where the 
 }
 ```
 
+## Add borders to code blocks
+
+You will need 2 things to add borders to the code blocks of a book.
+
+Add the following code block to your first page.
+
+````{verbatim}
+```{r, echo=FALSE}
+#Change colour, border, and text of code chunks
+#Check style.css for .Rchunk
+#https://stackoverflow.com/questions/65627531/change-r-chunk-background-color-in-bookdown-gitbook
+#https://bookdown.org/yihui/rmarkdown-cookbook/chunk-styling.html
+knitr::opts_chunk$set(class.source="Rchunk") 
+```
+````
+
+Add the following to your `style.css` page. You can of course change the coulors but I find the below one is good.
+
+```{css, eval=FALSE}
+.Rchunk {
+  background-color: #f7f7f7 !important;
+  border: 3px solid #808080 !important;
+  font-weight: bolder;
+}
+```
+
 ## Create one page html book
 
 Add the following to \_output.yml
@@ -358,6 +384,8 @@ bookdown::html_book:
   css: style.css
   toc: false
 ```
+
+
 
 Run the following command in the book dir to render
 
