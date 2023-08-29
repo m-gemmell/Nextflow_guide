@@ -21,6 +21,14 @@ knitr::write_bib(c(
 ), 'packages.bib')
 ```
 
+```{r, echo=FALSE}
+#Change colour, border, and text of code chunks
+#Check style.css for .Rchunk
+#https://stackoverflow.com/questions/65627531/change-r-chunk-background-color-in-bookdown-gitbook
+#https://bookdown.org/yihui/rmarkdown-cookbook/chunk-styling.html
+knitr::opts_chunk$set(class.source="Rchunk") 
+```
+
 # MG Bookdown Guide
 
 This is a quick and dirty guide on how I use bookdown. It is primarily for my use but if someone else finds it I hope it will also proof useful. Additionally, this was made with R Bookdown.
@@ -332,6 +340,8 @@ Chaning the `@media` from the default 1240px to 1440px fixed an issue where the 
 ```
 
 ## Add borders to code blocks
+
+The below instrcutions have been used on this book to alter the code block borders.
 
 You will need 2 things to add borders to the code blocks of a book.
 
