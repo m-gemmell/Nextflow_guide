@@ -50,6 +50,8 @@ knitr::opts_chunk$set(class.source="Rchunk")
 
 This is a quick and dirty guide on how I use bookdown. It is primarily for my use but if someone else finds it I hope it will also proof useful. Additionally, this was made with R Bookdown.
 
+Another useful resource is: https://rstudio4edu.github.io/rstudio4edu-book/intro-bookdown.html
+
 ## Intro
 
 R bookdown uses Rmarkdown. First learn some Rmarkdown then learn bookdown. Some useful links are below.
@@ -395,13 +397,38 @@ bookdown::html_book:
   toc: false
 ```
 
-
-
 Run the following command in the book dir to render
 
 ```{r, eval=FALSE}
 bookdown::render_book("01-XX.Rmd", "bookdown::html_book", output_dir = "one_file_book")
 ```
+
+## Font family
+
+You can change the font-family with the `style.css` file.
+
+I have used it to change the font-family of code. I am using the font-family "JetBrains Mono" from google fonts (https://fonts.google.com/specimen/JetBrains+Mono?preview.text=1%20l).
+
+I used the instructions from the following useful book: https://rstudio4edu.github.io/rstudio4edu-book/book-fancy.html#book-font
+
+For this I add the following to the top of my `style.css` code:
+
+```{css, eval=FALSE}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600&display=swap');
+```
+
+The I change the code bit in `stle.css` to:
+
+```{css, eval=FALSE}
+code {
+  white-space: inherit;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+```
+
+
+
+
 
 <!--chapter:end:01-MG_Bookdown_guide.Rmd-->
 
