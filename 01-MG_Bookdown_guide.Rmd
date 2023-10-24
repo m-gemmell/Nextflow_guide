@@ -411,6 +411,7 @@ For this I add the following to the top of my `style.css` code. This:
 code {
   white-space: inherit;
   font-family: 'JetBrains Mono', monospace !important;
+  font-weight: bolder;
 }
 ```
 
