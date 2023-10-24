@@ -390,24 +390,31 @@ bookdown::render_book("01-XX.Rmd", "bookdown::html_book", output_dir = "one_file
 
 You can change the font-family with the `style.css` file.
 
-I have used it to change the font-family of code. I am using the font-family "JetBrains Mono" from google fonts (https://fonts.google.com/specimen/JetBrains+Mono?preview.text=1%20l).
+I have used it to change the font-family of text. 
+
+- Text: Using "Lexend" which was designed to be dyslexic friendly but also helps everyone with eye strain. https://fonts.google.com/specimen/Lexend
+- Code: "JetBrains Mono" which can differentiat between `1, l, L, 0, o, and O`. (https://fonts.google.com/specimen/JetBrains+Mono?preview.text=1%20l).
 
 I used the instructions from the following useful book: https://rstudio4edu.github.io/rstudio4edu-book/book-fancy.html#book-font
 
-For this I add the following to the top of my `style.css` code:
+For this I add the following to the top of my `style.css` code. This:
+
+- Imports fonts from google fonts
+- Changes main font.
+- CHanges code font.
 
 ```{css, eval=FALSE}
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600&display=swap');
-```
-
-The I change the code bit in `stle.css` to:
-
-```{css, eval=FALSE}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Lexend&display=swap');
+.book.font-family-1 {
+  font-family: 'Lexend', sans-serif;
+ }
 code {
   white-space: inherit;
   font-family: 'JetBrains Mono', monospace !important;
 }
 ```
+
+
 
 
 
