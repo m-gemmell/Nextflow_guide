@@ -418,6 +418,7 @@ For this I add the following to the top of my `style.css` code. This:
 
 - Imports fonts from google fonts
 - Changes main font.
+- CHange table of contents font (sidebar navigation)
 - CHanges code font.
 
 ```{css, eval=FALSE}
@@ -425,6 +426,9 @@ For this I add the following to the top of my `style.css` code. This:
 .book.font-family-1 {
   font-family: 'Lexend', sans-serif;
  }
+  .summary{
+  font-family: 'Lexend', sans-serif;
+}
 code {
   white-space: inherit;
   font-family: 'JetBrains Mono', monospace !important;
