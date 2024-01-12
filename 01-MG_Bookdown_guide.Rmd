@@ -184,10 +184,8 @@ To make the MCQs have nice boxes around the text change the webex-radiogroup lab
   font-weight: 400;
   display: block;
   /*Set border of text to solid and dark grey*/
-  border: 2px solid #1d1d1d;
+  border: 2px solid #808080;
   border-radius: 0.25em;
-  /*Set colour in box to white so works for every bookdown colour scheme*/
-  background: white;
 }
 ```
 
@@ -199,11 +197,11 @@ __Note__: You will only be able to use free icons.
 
 ### Fontawesome
 
-The below code can be used to add `r icons::fontawesome("rocket", style="solid")`.
+The below code can be used to add `r icons::icon_style(icons::fontawesome("rocket", style="solid"), fill = "#648fff")`. Colour chosen to work on Day, Sepia, and Night font.
 
 ````{verbatim}
 ```{r, echo=FALSE}
-icons::fontawesome("rocket", style="solid")
+icons::icon_style(icons::fontawesome("rocket", style="solid"), fill = "#648fff")
 ```
 ````
 
@@ -212,7 +210,7 @@ To add to text do like so:
 ````{verbatim}
 A compass (
 ```{r, echo=FALSE}
-icons::fontawesome("compass", style="solid")
+icons::icon_style(icons::fontawesome("compass", style="solid"), fill = "#648fff")
 ```
 ) is useful to find north.
 ````
@@ -221,17 +219,17 @@ This will produce:
 
 A compass (
 ```{r, echo=FALSE}
-icons::fontawesome("compass", style="solid")
+icons::icon_style(icons::fontawesome("compass", style="solid"), fill = "#648fff")
 ```
 ) is useful to find north.
 
 ### Ionicons
 
-The below code can be used to add `r icons::ionicons("calculator")`.
+The below code can be used to add `r icons::icon_style(icons::ionicons("calculator"), fill = "#648fff")`.
 
 ````{verbatim}
 ```{r, echo=FALSE}
-icons::ionicons("calculator")
+icons::icon_style(icons::ionicons("calculator"), fill = "#648fff")
 ```
 ````
 
@@ -359,15 +357,19 @@ knitr::opts_chunk$set(class.source="Rchunk")
 ```
 ````
 
-Add the following to your `style.css` page. You can of course change the coulors but I find the below one is good.
+Add the following to your `style.css` page. You can of course change the colours but I find the below one is good.
 
 ```{css, eval=FALSE}
 .Rchunk {
-  background-color: #f7f7f7 !important;
   border: 3px solid #808080 !important;
   font-weight: bolder;
+  background-color: #f7f7f7 !important;
+  border-radius: 5px 5px 5px;
 }
 ```
+
+Ensure you also change yout code setting like in the below [Font settings part](#font_family).
+Otherwise the colouring will not be good for the Sepia and Night font settings.
 
 ## Create one page html book
 
@@ -386,7 +388,7 @@ Run the following command in the book dir to render
 bookdown::render_book("01-XX.Rmd", "bookdown::html_book", output_dir = "one_file_book")
 ```
 
-## Font family
+## Font family {#font_family}
 
 You can change the font-family with the `style.css` file.
 
@@ -415,12 +417,9 @@ For this I add the following to the top of my `style.css` code. This:
 code {
   white-space: inherit;
   font-family: 'Fira Mono', monospace !important;
-  font-weight: bolder;
+  font-weight: bolder !important;
+  background-color: #f7f7f7 !important;
+  color: #333333 !important;
+  border-radius: 5px 5px 5px;
 }
 ```
-
-
-
-
-
-
