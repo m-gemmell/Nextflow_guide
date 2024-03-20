@@ -67,14 +67,15 @@ Easiest way I find is to have 1 page per chapter File names need to start with a
 
 ## Add image
 
-To add an image you can use the following code:
+To add an image you can use the following HTML code:
 
 ````{verbatim}
-```{r, fig.align = 'center',out.width= '20%', echo=FALSE }
-knitr::include_graphics(path = "figures/R_community.png", auto_pdf = TRUE)
-``` 
+<center>
+![](figures/NEOF.png){style="width:200px"}
+</center>
 ````
-Another option is with HTML code which allows you more options.
+
+HTML code with more options:
 
 ````{verbatim}
 <center>
@@ -90,6 +91,14 @@ Another option is with HTML code which allows you more options.
 - border-radius: Adds curved corners, good for images with cornered background. 15px is a good default but may need to be increased/decreased depending on your image.
 - border: Adds a border around the image. Good for images with background.
 - background-color: Set to null for none, can set to white for a white background
+
+Optionally you can do it with R markdown code:
+
+````{verbatim}
+```{r, fig.align = 'center',out.width= '20%', echo=FALSE }
+knitr::include_graphics(path = "figures/R_community.png", auto_pdf = TRUE)
+``` 
+````
 
 ## Section part
 
