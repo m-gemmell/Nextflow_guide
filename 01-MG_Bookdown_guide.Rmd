@@ -62,6 +62,23 @@ HTMLS found in "\_book" directory Need to run render_book command to update any 
 
 Easiest way I find is to have 1 page per chapter File names need to start with a number to show order 01-, 02-, 03- etc
 
+## Libraries
+
+To use all the contents of this guide you will need to have a few R packages installed.
+FOr convenience all the install commands are below:
+
+```{R, eval=FALSE}
+install.packages("bookdown")
+install.packages("webexercises")
+#Icons, below code also included in that section in this guide
+install.packages("remotes")
+remotes::install_github("mitchelloharawild/icons")
+#Download icon sets
+icons::download_fontawesome()
+icons::download_ionicons()
+icons::download_bioicons()
+```
+
 ## Add image
 
 To add an image you can use the following HTML code:
