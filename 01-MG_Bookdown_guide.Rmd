@@ -70,6 +70,8 @@ FOr convenience all the install commands are below:
 ```{R, eval=FALSE}
 install.packages("bookdown")
 install.packages("webexercises")
+#Reticulate to allow use of python in knitr
+install.packages("reticulate")
 #Icons, below code also included in that section in this guide
 install.packages("remotes")
 remotes::install_github("mitchelloharawild/icons")
