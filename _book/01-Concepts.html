@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Page not found | MG Nextflow Guide</title>
+  <title>Chapter 2 Concepts | MG Nextflow Guide</title>
   <meta name="description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Page not found | MG Nextflow Guide" />
+  <meta property="og:title" content="Chapter 2 Concepts | MG Nextflow Guide" />
   <meta property="og:type" content="book" />
   <meta property="og:image" content="/figures/MG_bookdown_favicon.png" />
   <meta property="og:description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Page not found | MG Nextflow Guide" />
+  <meta name="twitter:title" content="Chapter 2 Concepts | MG Nextflow Guide" />
   
   <meta name="twitter:description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   <meta name="twitter:image" content="/figures/MG_bookdown_favicon.png" />
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="figures/MG_bookdown_favicon.png" type="image/x-icon" />
-
-
+<link rel="prev" href="index.html"/>
+<link rel="next" href="02-Basic_loytout.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -190,11 +190,127 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="page-not-found" class="section level1">
-<h1>Page not found</h1>
-<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
-<p>You may want to try searching to find the page's new location, or use
-the table of contents to find the page you are looking for.</p>
+<div id="concepts" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Concepts<a href="01-Concepts.html#concepts" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="workflow" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Workflow<a href="01-Concepts.html#workflow" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Nextflow is used to create workflows.
+A workflow consists of multiple <strong>processes</strong>.
+Each <strong>process</strong> has <strong>input</strong> and <strong>output</strong>.</p>
+<p>A <strong>process</strong> will not start until it has all the <strong>input</strong> it requires.
+This is important as a process will therefore wait till other <strong>processes</strong> are finished if the <strong>output</strong> of other <strong>processes</strong> are the <strong>input</strong> for the <strong>process</strong>.</p>
+<p>In the nextflow script each process is created in the main script body (or in a separate <code>main.nf</code> file).</p>
+<p>These <strong>processes</strong> are then called in the <strong>workflow</strong>.</p>
+<p>Example <code>main.nf</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb1-1"><a href="01-Concepts.html#cb1-1" tabindex="-1"></a><span class="co">#!/usr/bin/env nextflow</span></span>
+<span id="cb1-2"><a href="01-Concepts.html#cb1-2" tabindex="-1"></a><span class="ex">/*</span></span>
+<span id="cb1-3"><a href="01-Concepts.html#cb1-3" tabindex="-1"></a>  <span class="ex">*Params</span></span>
+<span id="cb1-4"><a href="01-Concepts.html#cb1-4" tabindex="-1"></a><span class="ex">*/</span></span>
+<span id="cb1-5"><a href="01-Concepts.html#cb1-5" tabindex="-1"></a><span class="ex">params.dir</span> = <span class="st">&quot;.&quot;</span></span>
+<span id="cb1-6"><a href="01-Concepts.html#cb1-6" tabindex="-1"></a><span class="ex">params.input1</span> = <span class="st">&quot;input.txt&quot;</span></span>
+<span id="cb1-7"><a href="01-Concepts.html#cb1-7" tabindex="-1"></a><span class="ex">/*</span></span>
+<span id="cb1-8"><a href="01-Concepts.html#cb1-8" tabindex="-1"></a>  <span class="ex">*</span> Processes</span>
+<span id="cb1-9"><a href="01-Concepts.html#cb1-9" tabindex="-1"></a><span class="ex">*/</span></span>
+<span id="cb1-10"><a href="01-Concepts.html#cb1-10" tabindex="-1"></a><span class="ex">process</span> STEP1 {</span>
+<span id="cb1-11"><a href="01-Concepts.html#cb1-11" tabindex="-1"></a>  <span class="ex">input:</span></span>
+<span id="cb1-12"><a href="01-Concepts.html#cb1-12" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="ex">input_data</span><span class="kw">)</span></span>
+<span id="cb1-13"><a href="01-Concepts.html#cb1-13" tabindex="-1"></a>  <span class="ex">output:</span></span>
+<span id="cb1-14"><a href="01-Concepts.html#cb1-14" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="st">&quot;output1.txt&quot;</span><span class="kw">)</span></span>
+<span id="cb1-15"><a href="01-Concepts.html#cb1-15" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb1-16"><a href="01-Concepts.html#cb1-16" tabindex="-1"></a><span class="ex">process</span> STEP2 {</span>
+<span id="cb1-17"><a href="01-Concepts.html#cb1-17" tabindex="-1"></a>  <span class="ex">input:</span></span>
+<span id="cb1-18"><a href="01-Concepts.html#cb1-18" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="ex">input_data</span><span class="kw">)</span></span>
+<span id="cb1-19"><a href="01-Concepts.html#cb1-19" tabindex="-1"></a>  <span class="ex">output:</span></span>
+<span id="cb1-20"><a href="01-Concepts.html#cb1-20" tabindex="-1"></a>      <span class="ex">path</span><span class="er">(</span><span class="st">&quot;output2.txt&quot;</span><span class="kw">)</span></span>
+<span id="cb1-21"><a href="01-Concepts.html#cb1-21" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb1-22"><a href="01-Concepts.html#cb1-22" tabindex="-1"></a><span class="ex">/*</span></span>
+<span id="cb1-23"><a href="01-Concepts.html#cb1-23" tabindex="-1"></a>  <span class="ex">*</span> workflow</span>
+<span id="cb1-24"><a href="01-Concepts.html#cb1-24" tabindex="-1"></a><span class="ex">*/</span></span>
+<span id="cb1-25"><a href="01-Concepts.html#cb1-25" tabindex="-1"></a><span class="ex">workflow</span> {</span>
+<span id="cb1-26"><a href="01-Concepts.html#cb1-26" tabindex="-1"></a>  <span class="ex">///</span> Set input param to channel</span>
+<span id="cb1-27"><a href="01-Concepts.html#cb1-27" tabindex="-1"></a>  <span class="va">input1_ch</span><span class="op">=</span>file<span class="kw">(</span><span class="ex">params.input1</span><span class="kw">)</span></span>
+<span id="cb1-28"><a href="01-Concepts.html#cb1-28" tabindex="-1"></a>  <span class="ex">///</span> Process 1</span>
+<span id="cb1-29"><a href="01-Concepts.html#cb1-29" tabindex="-1"></a>  <span class="ex">step1</span><span class="er">(</span><span class="ex">input1_ch</span><span class="kw">)</span></span>
+<span id="cb1-30"><a href="01-Concepts.html#cb1-30" tabindex="-1"></a>  <span class="ex">///</span> Process 2</span>
+<span id="cb1-31"><a href="01-Concepts.html#cb1-31" tabindex="-1"></a>  <span class="ex">step2</span><span class="er">(</span><span class="ex">step1.out</span><span class="kw">)</span></span>
+<span id="cb1-32"><a href="01-Concepts.html#cb1-32" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+</div>
+<div id="variables" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Variables<a href="01-Concepts.html#variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Nextflow <strong>Variables</strong> are used across a nextflow script.
+Within the <code>script</code> section of a <code>process</code> block they are denoted by <code>$</code> (e.g. <code>$sample_id</code>).</p>
+<p><strong>Variable</strong> names cannot start with numbers.</p>
+<p>Bash <strong>variables</strong> within a <code>script</code> section must be denoted by a <code>\</code> (e.g. <code>\$var</code>).</p>
+</div>
+<div id="channels-tuples-lists" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Channels, tuples, &amp; lists<a href="01-Concepts.html#channels-tuples-lists" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><strong>Channels</strong>, <strong>tuples</strong>, and <strong>lists</strong> are objects that contain multiple objects but work in different ways.</p>
+<div id="channels" class="section level3 hasAnchor" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> Channels<a href="01-Concepts.html#channels" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Channels</strong> are specified and used in the <strong>workflow</strong> section.
+A <strong>Channel</strong> contains a number of <strong>values</strong>.
+Each <strong>value</strong> passes through a process separately, this is carried out via parallelisation.</p>
+<p>Example:</p>
+<ul>
+<li>A <strong>Channel</strong> called <code>integers_ch</code> contains the 10 values 1,2,3,4,5,6,7,8, &amp; 9.</li>
+<li>A process called <code>multiple_by_10</code> multiples input by 10.</li>
+<li>If the <strong>Channel</strong> <code>integers_ch</code> was used as the input for the <strong>process</strong> <code>multiple_by_10</code> the output woudl be a <strong>Channel</strong> of 10 values containing the <strong>values</strong> 10,20,30,40,50,60,70,80, &amp; 90.</li>
+</ul>
+</div>
+<div id="tuples-lists" class="section level3 hasAnchor" number="2.3.2">
+<h3><span class="header-section-number">2.3.2</span> Tuples &amp; Lists<a href="01-Concepts.html#tuples-lists" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Tuples</strong> &amp; <strong>Lists</strong> are used within <strong>process</strong> blocks.
+There are many ways to create and manipulate them within and without <strong>process blocks</strong>.</p>
+<p>Confusingly <strong>Tuples</strong> &amp; <strong>Lists</strong> are both structured as <code>[value_1,value_2,value_3]</code>.</p>
+<div id="tuples" class="section level4 hasAnchor" number="2.3.2.1">
+<h4><span class="header-section-number">2.3.2.1</span> Tuples<a href="01-Concepts.html#tuples" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p><strong>Tuples</strong> contain multiple values with each value assigned as a separate variable in a process.
+This allows you to input/output data which should be grouped together.
+The below example shows how to group sample ids with their paired fastq reads.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb2-1"><a href="01-Concepts.html#cb2-1" tabindex="-1"></a><span class="ex">process</span> step1 {</span>
+<span id="cb2-2"><a href="01-Concepts.html#cb2-2" tabindex="-1"></a>  <span class="ex">input:</span></span>
+<span id="cb2-3"><a href="01-Concepts.html#cb2-3" tabindex="-1"></a>    <span class="ex">tuple</span> val<span class="er">(</span><span class="ex">sample_id</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="ex">r1</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="ex">r2</span><span class="kw">)</span></span>
+<span id="cb2-4"><a href="01-Concepts.html#cb2-4" tabindex="-1"></a>  <span class="ex">output:</span></span>
+<span id="cb2-5"><a href="01-Concepts.html#cb2-5" tabindex="-1"></a>    <span class="ex">tuple</span> val<span class="er">(</span><span class="ex">sample_id</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="st">&quot;</span><span class="va">${sample_id}</span><span class="st">_r1_trimmed.fastq&quot;</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="st">&quot;</span><span class="va">${sample_id}</span><span class="st">_r2_trimmed.fastq&quot;</span><span class="kw">)</span></span>
+<span id="cb2-6"><a href="01-Concepts.html#cb2-6" tabindex="-1"></a>  <span class="ex">script:</span></span>
+<span id="cb2-7"><a href="01-Concepts.html#cb2-7" tabindex="-1"></a>  <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-8"><a href="01-Concepts.html#cb2-8" tabindex="-1"></a><span class="st">  trim -i1 </span><span class="va">$r1</span><span class="st"> -i2 </span><span class="va">$r2</span><span class="st"> </span><span class="dt">\</span></span>
+<span id="cb2-9"><a href="01-Concepts.html#cb2-9" tabindex="-1"></a><span class="st">  -o1 </span><span class="va">${sample_id}</span><span class="st">_r1_trimmed.fastq -o2 </span><span class="va">${sample_id}</span><span class="st">_r2_trimmed.fastq</span></span>
+<span id="cb2-10"><a href="01-Concepts.html#cb2-10" tabindex="-1"></a><span class="st">  &quot;&quot;&quot;</span></span>
+<span id="cb2-11"><a href="01-Concepts.html#cb2-11" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>This is important as multiple <strong>Channels</strong> with multiple <strong>values</strong> are not ordered relative to each other.</p>
+</div>
+<div id="lists" class="section level4 hasAnchor" number="2.3.2.2">
+<h4><span class="header-section-number">2.3.2.2</span> Lists<a href="01-Concepts.html#lists" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>When a <strong>List</strong> is used within a <strong>script</strong> block all the <strong>values</strong> will be used together with a space (<code></code>) between each value.</p>
+<p>Example:</p>
+<p>The <strong>Channel</strong> <code>r1_fastqs_ch</code> contains the <strong>List</strong> <code>["S1_R1.fastq","S2_R1.fastq","S3_R1.fastq"]</code></p>
+<p>The below truncated nextflow script to run fastqc....</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb3-1"><a href="01-Concepts.html#cb3-1" tabindex="-1"></a><span class="ex">process</span> r1_fastqc {</span>
+<span id="cb3-2"><a href="01-Concepts.html#cb3-2" tabindex="-1"></a>  <span class="ex">input:</span></span>
+<span id="cb3-3"><a href="01-Concepts.html#cb3-3" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="ex">r1s</span><span class="kw">)</span></span>
+<span id="cb3-4"><a href="01-Concepts.html#cb3-4" tabindex="-1"></a>  <span class="ex">output:</span></span>
+<span id="cb3-5"><a href="01-Concepts.html#cb3-5" tabindex="-1"></a>    <span class="ex">.....</span></span>
+<span id="cb3-6"><a href="01-Concepts.html#cb3-6" tabindex="-1"></a>  <span class="ex">script:</span></span>
+<span id="cb3-7"><a href="01-Concepts.html#cb3-7" tabindex="-1"></a>  <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb3-8"><a href="01-Concepts.html#cb3-8" tabindex="-1"></a><span class="st">  fastqc -o fastqc_output </span><span class="dt">\</span></span>
+<span id="cb3-9"><a href="01-Concepts.html#cb3-9" tabindex="-1"></a><span class="st">  </span><span class="va">$r1s</span></span>
+<span id="cb3-10"><a href="01-Concepts.html#cb3-10" tabindex="-1"></a><span class="st">  &quot;&quot;&quot;</span></span>
+<span id="cb3-11"><a href="01-Concepts.html#cb3-11" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb3-12"><a href="01-Concepts.html#cb3-12" tabindex="-1"></a><span class="ex">workflow</span> {</span>
+<span id="cb3-13"><a href="01-Concepts.html#cb3-13" tabindex="-1"></a>  <span class="ex">r1_fastqc</span><span class="er">(</span><span class="ex">r1_fastqs_ch</span><span class="kw">)</span></span>
+<span id="cb3-14"><a href="01-Concepts.html#cb3-14" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>Would be run as:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb4-1"><a href="01-Concepts.html#cb4-1" tabindex="-1"></a><span class="ex">fastqc</span> <span class="at">-o</span> fastqc_output <span class="dt">\</span></span>
+<span id="cb4-2"><a href="01-Concepts.html#cb4-2" tabindex="-1"></a>S1_R1.fastq S2_R1.fastq S3_R1.fastq</span></code></pre></div>
+</div>
+<div id="combinations" class="section level4 hasAnchor" number="2.3.2.3">
+<h4><span class="header-section-number">2.3.2.3</span> Combinations<a href="01-Concepts.html#combinations" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Of course you can have a <strong>Channel</strong> that can contain multiple <strong>Tuples</strong> and/or <strong>Lists</strong>. Additionally <strong>Tuples</strong> can contain <strong>Lists</strong>.</p>
+
+</div>
+</div>
+</div>
 </div>
 <script>
 
@@ -407,8 +523,8 @@ window.onload = function() {
           </div>
         </div>
       </div>
-
-
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="02-Basic_loytout.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -1,0 +1,347 @@
+---
+title: "MG Nextflow Guide"
+author: "Matthew R. Gemmell"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+favicon: figures/MG_bookdown_favicon.png
+description: NEOF book for the Introduction to command line bioinformatics workshop
+cover-image: "figures/MG_bookdown_favicon.png"
+---
+```{r include=FALSE, cache=FALSE}
+library(webexercises)
+```
+
+```{r cite-packages, include = FALSE}
+# automatically create a bib database for R packages
+# add any packages you want to cite here
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'webexercises', 'qmethod'
+), 'packages.bib')
+```
+
+```{r, echo=FALSE}
+#Change colour, border, and text of code chunks
+#Check style.css for .Rchunk
+#https://stackoverflow.com/questions/65627531/change-r-chunk-background-color-in-bookdown-gitbook
+#https://bookdown.org/yihui/rmarkdown-cookbook/chunk-styling.html
+knitr::opts_chunk$set(class.source="Rchunk") 
+```
+
+# Intro
+
+This is a quick and dirty guide on how I use Nextflow.
+It is primarily for my use but if someone else finds it I hope it will also proof useful. 
+Additionally, this was made with R Bookdown.
+
+## Contents
+
+The chapters in this bookdown include:
+
+[Concepts](#concepts): 
+
+## Links
+
+Useful links include:
+
+- [nextflow.io](https://www.nextflow.io/): The main website for Nextflow
+- [training.nextflow.io](https://training.nextflow.io/): Website with tutorials for Nextflow
+
+<!--chapter:end:index.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+library(webexercises)
+```
+# Concepts
+
+## Workflow
+
+Nextflow is used to create workflows.
+A workflow consists of multiple __processes__.
+Each __process__ has __input__ and __output__.
+
+A __process__ will not start until it has all the __input__ it requires.
+This is important as a process will therefore wait till other __processes__ are finished if the __output__ of other __processes__ are the __input__ for the __process__.
+
+In the nextflow script each process is created in the main script body (or in a separate `main.nf` file).
+
+These __processes__ are then called in the __workflow__.
+
+Example `main.nf`
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+/*
+  *Params
+*/
+params.dir = "."
+params.input1 = "input.txt"
+/*
+  * Processes
+*/
+process STEP1 {
+  input:
+    path(input_data)
+  output:
+    path("output1.txt")
+}
+process STEP2 {
+  input:
+    path(input_data)
+  output:
+      path("output2.txt")
+}
+/*
+  * workflow
+*/
+workflow {
+  /// Set input param to channel
+  input1_ch=file(params.input1)
+  /// Process 1
+  step1(input1_ch)
+  /// Process 2
+  step2(step1.out)
+}
+``` 
+
+## Variables
+
+Nextflow __Variables__ are used across a nextflow script.
+Within the `script` section of a `process` block they are denoted by `$` (e.g. `$sample_id`).
+
+__Variable__ names cannot start with numbers.
+
+Bash __variables__ within a `script` section must be denoted by a `\` (e.g. `\$var`).
+
+## Channels, tuples, & lists
+
+__Channels__, __tuples__, and __lists__ are objects that contain multiple objects but work in different ways.
+
+### Channels
+
+__Channels__ are specified and used in the __workflow__ section. 
+A __Channel__ contains a number of __values__.
+Each __value__ passes through a process separately, this is carried out via parallelisation.
+
+Example:
+
+- A __Channel__ called `integers_ch` contains the 10 values 1,2,3,4,5,6,7,8, & 9.
+- A process called `multiple_by_10` multiples input by 10.
+- If the __Channel__ `integers_ch` was used as the input for the __process__ `multiple_by_10` the output woudl be a __Channel__ of 10 values containing the __values__ 10,20,30,40,50,60,70,80, & 90.
+
+### Tuples & Lists
+
+__Tuples__ & __Lists__ are used within __process__ blocks.
+There are many ways to create and manipulate them within and without __process blocks__.
+
+Confusingly __Tuples__ & __Lists__ are both structured as `[value_1,value_2,value_3]`.
+
+#### Tuples
+
+__Tuples__ contain multiple values with each value assigned as a separate variable in a process.
+This allows you to input/output data which should be grouped together.
+The below example shows how to group sample ids with their paired fastq reads.
+
+```{bash, eval=FALSE }
+process step1 {
+  input:
+    tuple val(sample_id), path(r1), path(r2)
+  output:
+    tuple val(sample_id), path("${sample_id}_r1_trimmed.fastq"), path("${sample_id}_r2_trimmed.fastq")
+  script:
+  """
+  trim -i1 $r1 -i2 $r2 \
+  -o1 ${sample_id}_r1_trimmed.fastq -o2 ${sample_id}_r2_trimmed.fastq
+  """
+}
+```
+
+This is important as multiple __Channels__ with multiple __values__ are not ordered relative to each other.
+
+#### Lists
+
+When a __List__ is used within a __script__ block all the __values__ will be used together with a space (` `) between each value.
+
+Example:
+
+The __Channel__ `r1_fastqs_ch` contains the __List__ `["S1_R1.fastq","S2_R1.fastq","S3_R1.fastq"]`
+
+The below truncated nextflow script to run fastqc....
+
+```{bash, eval=FALSE }
+process r1_fastqc {
+  input:
+    path(r1s)
+  output:
+    .....
+  script:
+  """
+  fastqc -o fastqc_output \
+  $r1s
+  """
+}
+workflow {
+  r1_fastqc(r1_fastqs_ch)
+}
+```
+
+Would be run as:
+
+```{bash, eval=FALSE }
+fastqc -o fastqc_output \
+S1_R1.fastq S2_R1.fastq S3_R1.fastq
+```
+
+#### Combinations
+
+Of course you can have a __Channel__ that can contain multiple __Tuples__ and/or __Lists__. Additionally __Tuples__ can contain __Lists__.
+
+<!--chapter:end:01-Concepts.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+library(webexercises)
+```
+# Basic layout
+
+When using Nextflow each project should be within its own directory.
+
+Within the main directory of the project you will have all the Nextflow files you need.
+
+There are many Nextflow files you can have but the only essential file is a main `.nf` file which many people like to name as `main.nf`.
+
+This chapter will go over a basic `main.nf` file and its different parts.
+
+## `main.nf`
+
+The `main.nf` is a plain text file that contains Nextflow code.
+Below is an example:
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+/*
+  *Params
+*/
+params.dir = "."
+params.outdir = "./results"
+params.input_file = "/path/to/data/input.txt"
+
+/*
+  * Processes
+*/
+process STEP1 {
+  publishDir:
+    params.outdir, mode: 'copy'
+  input:
+    path(input_data)
+  output:
+    path("output1.txt")
+  script:
+  """
+  create_output -i $input_data -o output1.txt
+  """
+}
+
+process STEP2 {
+  publishDir:
+    params.outdir, mode: 'copy'
+  input:
+    path(input_data)
+  output:
+    path("output2.txt")
+  script:
+  """
+  create_output_2 -i $input_data -o output2.txt
+  """
+}
+
+/*
+  * workflow
+*/
+workflow {
+  /// Set input params to channels
+  input_ch=file(params.input_file)
+  /// Process 1
+  STEP1(input_ch)
+  /// Process 2
+  STEP2(step1.out)
+}
+``` 
+
+## Params
+
+The first section is the various initial parameters. This is useful for specifying input information for the workflow including:
+
+- Input & output directories
+- Input data
+- Metadata information
+- Reference files
+
+Any time they are used anywhere within the script they must include `params.` as a prefix.
+
+## Processes
+
+__Processes__ are how the tasks of a workflow are specified and have many parts.
+
+[__Process reference__](https://www.nextflow.io/docs/latest/reference/process.html#process-reference)
+
+### Initialistion
+
+A __process__ is defined by `process NAME` and the __process__ body is cotnained with `{}`.
+
+The __Process__ name is arbitrary and decided by the workflow designer.
+However some suggestions are:
+
+- Do not start the name with numbers.
+- Capitalise all letters used, this is normal convention and makes it easier to see what are __processes__ in your __workflow__ block.
+- Separate words with `_`.
+- Ensure all process names are unique and somewhat descriptive within your workflow.
+
+### publishDir
+
+All files created by the __Process__ will be contained with the workflow's `work` directory (more info later).
+All files specified in the `output` section will be stored in the directory specified by `publishDir`, if the directory does not exist Nextflow will create it.
+The output data is stored in the specified based on the `mode:`.
+
+The modes are:
+
+- `copy`: Copies the output files into the publish directory.
+- `copyNoFollow`: Copies the output files into the publish directory without following symlinks ie. copies the links themselves.
+- `link`: Creates a hard link in the publish directory for each output file.
+- `move`: Moves the output files into the publish directory. Note: this is only supposed to be used for a terminal process i.e. a process whose output is not consumed by any other downstream process.
+- `rellink`: Creates a relative symbolic link in the publish directory for each output file.
+- `symlink`: Creates an absolute symbolic link in the publish directory for each output file (default).
+
+More info on [`publishDir`](https://www.nextflow.io/docs/latest/reference/process.html#publishdir)
+
+### input
+
+These specify the input names and type.
+Input names are arbitrary but should follow variables rules.
+
+The 2 basic input types are:
+
+- `path`: Specifies paths, generally poiting to files.
+- `val`: Specifies values, these are generally text or numbers such as sample ids.
+
+### output
+
+These specify the output.
+
+If the output is a file it needs to be the actual name of the output file in quotes (double quotes are normally preferred).
+
+### script
+
+The script block, denoted by flanking triple double quotes (`"""`), contains the code the __process__ will carry out.
+By default this will be `bash` code.
+
+Input variables can be denoted by a `$` and output variables are written like normal script but can also use input variables such as sample ids.
+
+## workflow
+The workflow section is where all the other sections come together so the workflow knows how to utilise them.
+
+<!--chapter:end:02-Basic_loytout.Rmd-->
+

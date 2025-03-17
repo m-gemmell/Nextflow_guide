@@ -1,0 +1,143 @@
+# Concepts
+
+## Workflow
+
+Nextflow is used to create workflows.
+A workflow consists of multiple __processes__.
+Each __process__ has __input__ and __output__.
+
+A __process__ will not start until it has all the __input__ it requires.
+This is important as a process will therefore wait till other __processes__ are finished if the __output__ of other __processes__ are the __input__ for the __process__.
+
+In the nextflow script each process is created in the main script body (or in a separate `main.nf` file).
+
+These __processes__ are then called in the __workflow__.
+
+Example `main.nf`
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+/*
+  *Params
+*/
+params.dir = "."
+params.input1 = "input.txt"
+/*
+  * Processes
+*/
+process STEP1 {
+  input:
+    path(input_data)
+  output:
+    path("output1.txt")
+}
+process STEP2 {
+  input:
+    path(input_data)
+  output:
+      path("output2.txt")
+}
+/*
+  * workflow
+*/
+workflow {
+  /// Set input param to channel
+  input1_ch=file(params.input1)
+  /// Process 1
+  step1(input1_ch)
+  /// Process 2
+  step2(step1.out)
+}
+``` 
+
+## Variables
+
+Nextflow __Variables__ are used across a nextflow script.
+Within the `script` section of a `process` block they are denoted by `$` (e.g. `$sample_id`).
+
+__Variable__ names cannot start with numbers.
+
+Bash __variables__ within a `script` section must be denoted by a `\` (e.g. `\$var`).
+
+## Channels, tuples, & lists
+
+__Channels__, __tuples__, and __lists__ are objects that contain multiple objects but work in different ways.
+
+### Channels
+
+__Channels__ are specified and used in the __workflow__ section. 
+A __Channel__ contains a number of __values__.
+Each __value__ passes through a process separately, this is carried out via parallelisation.
+
+Example:
+
+- A __Channel__ called `integers_ch` contains the 10 values 1,2,3,4,5,6,7,8, & 9.
+- A process called `multiple_by_10` multiples input by 10.
+- If the __Channel__ `integers_ch` was used as the input for the __process__ `multiple_by_10` the output woudl be a __Channel__ of 10 values containing the __values__ 10,20,30,40,50,60,70,80, & 90.
+
+### Tuples & Lists
+
+__Tuples__ & __Lists__ are used within __process__ blocks.
+There are many ways to create and manipulate them within and without __process blocks__.
+
+Confusingly __Tuples__ & __Lists__ are both structured as `[value_1,value_2,value_3]`.
+
+#### Tuples
+
+__Tuples__ contain multiple values with each value assigned as a separate variable in a process.
+This allows you to input/output data which should be grouped together.
+The below example shows how to group sample ids with their paired fastq reads.
+
+```{bash, eval=FALSE }
+process step1 {
+  input:
+    tuple val(sample_id), path(r1), path(r2)
+  output:
+    tuple val(sample_id), path("${sample_id}_r1_trimmed.fastq"), path("${sample_id}_r2_trimmed.fastq")
+  script:
+  """
+  trim -i1 $r1 -i2 $r2 \
+  -o1 ${sample_id}_r1_trimmed.fastq -o2 ${sample_id}_r2_trimmed.fastq
+  """
+}
+```
+
+This is important as multiple __Channels__ with multiple __values__ are not ordered relative to each other.
+
+#### Lists
+
+When a __List__ is used within a __script__ block all the __values__ will be used together with a space (` `) between each value.
+
+Example:
+
+The __Channel__ `r1_fastqs_ch` contains the __List__ `["S1_R1.fastq","S2_R1.fastq","S3_R1.fastq"]`
+
+The below truncated nextflow script to run fastqc....
+
+```{bash, eval=FALSE }
+process r1_fastqc {
+  input:
+    path(r1s)
+  output:
+    .....
+  script:
+  """
+  fastqc -o fastqc_output \
+  $r1s
+  """
+}
+workflow {
+  r1_fastqc(r1_fastqs_ch)
+}
+```
+
+Would be run as:
+
+```{bash, eval=FALSE }
+fastqc -o fastqc_output \
+S1_R1.fastq S2_R1.fastq S3_R1.fastq
+```
+
+#### Combinations
+
+Of course you can have a __Channel__ that can contain multiple __Tuples__ and/or __Lists__. Additionally __Tuples__ can contain __Lists__.

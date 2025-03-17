@@ -1,0 +1,49 @@
+---
+title: "MG Nextflow Guide"
+author: "Matthew R. Gemmell"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+favicon: figures/MG_bookdown_favicon.png
+description: NEOF book for the Introduction to command line bioinformatics workshop
+cover-image: "figures/MG_bookdown_favicon.png"
+---
+
+```{r cite-packages, include = FALSE}
+# automatically create a bib database for R packages
+# add any packages you want to cite here
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'webexercises', 'qmethod'
+), 'packages.bib')
+```
+
+```{r, echo=FALSE}
+#Change colour, border, and text of code chunks
+#Check style.css for .Rchunk
+#https://stackoverflow.com/questions/65627531/change-r-chunk-background-color-in-bookdown-gitbook
+#https://bookdown.org/yihui/rmarkdown-cookbook/chunk-styling.html
+knitr::opts_chunk$set(class.source="Rchunk") 
+```
+
+# Intro
+
+This is a quick and dirty guide on how I use Nextflow.
+It is primarily for my use but if someone else finds it I hope it will also proof useful. 
+Additionally, this was made with R Bookdown.
+
+## Contents
+
+The chapters in this bookdown include:
+
+[Concepts](#concepts): 
+
+## Links
+
+Useful links include:
+
+- [nextflow.io](https://www.nextflow.io/): The main website for Nextflow
+- [training.nextflow.io](https://training.nextflow.io/): Website with tutorials for Nextflow
