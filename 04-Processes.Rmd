@@ -1,0 +1,163 @@
+# Processes
+
+This section includes some extra features related to __processes__.
+
+A full link of process info can be seen in the [nextflow docs](https://www.nextflow.io/docs/latest/reference/process.html)
+
+## Directives
+
+You can include directives in each process. These can be used to specify the execution requirements of a process.
+
+### cpus
+
+One example is that you can use `cpus` to specify the number of cpus to be used by a process.
+
+```{bash, eval=FALSE }
+process RUN {
+  cpus 2
+}
+```
+
+### publishDir
+
+The basics of [pblishDir](#basic_publishdir)
+
+My preferred method is to assign an overall output/results directory as a params.
+
+```{bash, eval=FALSE }
+params.outdir="./results"
+
+process RUN {
+  publishDir params.outdir, mode: 'copy'
+}
+```
+
+You can also set a subdiretcory of the output directory in the process.
+
+```{bash, eval=FALSE }
+params.outdir="./results"
+
+process RUN {
+  publishDir {
+    "${params.outdir}/stage_1"
+    }, mode: 'copy'
+}
+```
+
+You can even do this with input variables.
+
+```{bash, eval=FALSE }
+params.outdir="./results"
+input:
+  val sample_id
+process RUN {
+  publishDir {
+    "${params.outdir}/stage_1/${sample_id}"
+    }, mode: 'copy'
+}
+```
+
+### conda
+
+A conda environment can be specified.
+
+Further info on using [conda environments](https://www.nextflow.io/docs/latest/conda.html#conda-page)
+
+#### Local environment
+
+You can specify a conda environment you have locally created.
+
+```{bash, eval=FALSE }
+process RUN {
+  conda "/home/minforge3/envs/run_env"
+}
+```
+
+If using a locally installed env it is best to specify it as a params to make it quicker to add.edit for multiple processes.
+
+```{bash, eval=FALSE }
+params.conda_env="/home/minforge3/envs/run_env"
+
+process RUN {
+  conda params.conda_env
+}
+```
+
+#### URI based environment
+
+You can have nextflow install a conda packages for specific process.
+
+```{bash, eval=FALSE }
+process RUN {
+  conda "bioconda::samtools=1.20"
+}
+```
+
+You can find what packages can be downloaded this way through [sequera containers](https://seqera.io/containers/).
+
+For an easy example search for `bioconda::samtools` on the above link.
+
+#### Setting workflow to conda usage
+
+When you want to use the specified conda environments in a workflow you must either:
+
+Include `-with-conda`/`-use-conda` in the `nextflow run` command
+
+or:
+
+Better yet add `conda.enabled=true` to your `nextflow.config` file
+
+## Script
+
+### Variables
+
+Within the script nextflow variables are called as `${samples_id}`.
+
+Bash variables are called as `\${sample_id}`
+
+### Other languages
+
+Other languages can be used within the nextflow script section.
+
+For example python:
+
+```{bash, eval=FALSE }
+script
+"""
+#!/usr/bin/env python
+"""
+```
+
+## Modules
+
+The primary `main.nf` can become quite large by having a lot of __processes__.
+To counteract this each process can be stored in a separate `main.nf` file.
+
+The recommendation is to store them in a directory called `modules/local` within the main workflow directory.
+Then each process would be within a `main.nf` file within various directories.
+
+A module `main.nf` would be as so:
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+process RUN {
+  / proces contents
+}
+```
+
+Modules are imported as a process as so:
+
+```{bash, eval=FALSE }
+/*
+ * Processes
+*/
+include { FASTQC_RAW } from './modules/local/run/main.nf`
+```
+
+It is common to have subdirectories within `modules/local` grouped by tools. For example if you were performing 16S analysis with qiime2 you may have some of the following modules:
+
+```{bash, eval=FALSE }
+include { IMPORT } from './modules/local/qiime2/import_data/main.nf'
+include { CUTADAPT } from './modules/local/qiime2/cutadpat/main.nf'
+include { DADA2 } from './modules/local/qiime2/dada2/main.nf'
+```

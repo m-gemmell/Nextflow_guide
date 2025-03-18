@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Page not found | MG Nextflow Guide</title>
+  <title>Chapter 5 Processes | MG Nextflow Guide</title>
   <meta name="description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Page not found | MG Nextflow Guide" />
+  <meta property="og:title" content="Chapter 5 Processes | MG Nextflow Guide" />
   <meta property="og:type" content="book" />
   <meta property="og:image" content="/figures/MG_bookdown_favicon.png" />
   <meta property="og:description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Page not found | MG Nextflow Guide" />
+  <meta name="twitter:title" content="Chapter 5 Processes | MG Nextflow Guide" />
   
   <meta name="twitter:description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   <meta name="twitter:image" content="/figures/MG_bookdown_favicon.png" />
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="figures/MG_bookdown_favicon.png" type="image/x-icon" />
-
-
+<link rel="prev" href="03-Channels_tuples_lists.html"/>
+<link rel="next" href="05-Workflow.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -226,11 +226,121 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="page-not-found" class="section level1">
-<h1>Page not found</h1>
-<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
-<p>You may want to try searching to find the page's new location, or use
-the table of contents to find the page you are looking for.</p>
+<div id="processes-1" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Processes<a href="04-Processes.html#processes-1" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This section includes some extra features related to <strong>processes</strong>.</p>
+<p>A full link of process info can be seen in the <a href="https://www.nextflow.io/docs/latest/reference/process.html">nextflow docs</a></p>
+<div id="directives" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Directives<a href="04-Processes.html#directives" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>You can include directives in each process. These can be used to specify the execution requirements of a process.</p>
+<div id="cpus" class="section level3 hasAnchor" number="5.1.1">
+<h3><span class="header-section-number">5.1.1</span> cpus<a href="04-Processes.html#cpus" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>One example is that you can use <code>cpus</code> to specify the number of cpus to be used by a process.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb18-1"><a href="04-Processes.html#cb18-1" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb18-2"><a href="04-Processes.html#cb18-2" tabindex="-1"></a>  <span class="ex">cpus</span> 2</span>
+<span id="cb18-3"><a href="04-Processes.html#cb18-3" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+</div>
+<div id="publishdir" class="section level3 hasAnchor" number="5.1.2">
+<h3><span class="header-section-number">5.1.2</span> publishDir<a href="04-Processes.html#publishdir" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The basics of <a href="02-Basic_layout.html#basic_publishdir">pblishDir</a></p>
+<p>My preferred method is to assign an overall output/results directory as a params.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb19-1"><a href="04-Processes.html#cb19-1" tabindex="-1"></a><span class="ex">params.outdir=</span><span class="st">&quot;./results&quot;</span></span>
+<span id="cb19-2"><a href="04-Processes.html#cb19-2" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="04-Processes.html#cb19-3" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb19-4"><a href="04-Processes.html#cb19-4" tabindex="-1"></a>  <span class="ex">publishDir</span> params.outdir, mode: <span class="st">&#39;copy&#39;</span></span>
+<span id="cb19-5"><a href="04-Processes.html#cb19-5" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>You can also set a subdiretcory of the output directory in the process.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb20-1"><a href="04-Processes.html#cb20-1" tabindex="-1"></a><span class="ex">params.outdir=</span><span class="st">&quot;./results&quot;</span></span>
+<span id="cb20-2"><a href="04-Processes.html#cb20-2" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="04-Processes.html#cb20-3" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb20-4"><a href="04-Processes.html#cb20-4" tabindex="-1"></a>  <span class="ex">publishDir</span> {</span>
+<span id="cb20-5"><a href="04-Processes.html#cb20-5" tabindex="-1"></a>    <span class="st">&quot;</span><span class="va">${params</span><span class="er">.outdir</span><span class="va">}</span><span class="st">/stage_1&quot;</span></span>
+<span id="cb20-6"><a href="04-Processes.html#cb20-6" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span> mode: <span class="st">&#39;copy&#39;</span></span>
+<span id="cb20-7"><a href="04-Processes.html#cb20-7" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>You can even do this with input variables.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb21-1"><a href="04-Processes.html#cb21-1" tabindex="-1"></a><span class="ex">params.outdir=</span><span class="st">&quot;./results&quot;</span></span>
+<span id="cb21-2"><a href="04-Processes.html#cb21-2" tabindex="-1"></a><span class="ex">input:</span></span>
+<span id="cb21-3"><a href="04-Processes.html#cb21-3" tabindex="-1"></a>  <span class="ex">val</span> sample_id</span>
+<span id="cb21-4"><a href="04-Processes.html#cb21-4" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb21-5"><a href="04-Processes.html#cb21-5" tabindex="-1"></a>  <span class="ex">publishDir</span> {</span>
+<span id="cb21-6"><a href="04-Processes.html#cb21-6" tabindex="-1"></a>    <span class="st">&quot;</span><span class="va">${params</span><span class="er">.outdir</span><span class="va">}</span><span class="st">/stage_1/</span><span class="va">${sample_id}</span><span class="st">&quot;</span></span>
+<span id="cb21-7"><a href="04-Processes.html#cb21-7" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span> mode: <span class="st">&#39;copy&#39;</span></span>
+<span id="cb21-8"><a href="04-Processes.html#cb21-8" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+</div>
+<div id="conda" class="section level3 hasAnchor" number="5.1.3">
+<h3><span class="header-section-number">5.1.3</span> conda<a href="04-Processes.html#conda" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A conda environment can be specified.</p>
+<p>Further info on using <a href="https://www.nextflow.io/docs/latest/conda.html#conda-page">conda environments</a></p>
+<div id="local-environment" class="section level4 hasAnchor" number="5.1.3.1">
+<h4><span class="header-section-number">5.1.3.1</span> Local environment<a href="04-Processes.html#local-environment" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>You can specify a conda environment you have locally created.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb22-1"><a href="04-Processes.html#cb22-1" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb22-2"><a href="04-Processes.html#cb22-2" tabindex="-1"></a>  <span class="ex">conda</span> <span class="st">&quot;/home/minforge3/envs/run_env&quot;</span></span>
+<span id="cb22-3"><a href="04-Processes.html#cb22-3" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>If using a locally installed env it is best to specify it as a params to make it quicker to add.edit for multiple processes.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb23-1"><a href="04-Processes.html#cb23-1" tabindex="-1"></a><span class="ex">params.conda_env=</span><span class="st">&quot;/home/minforge3/envs/run_env&quot;</span></span>
+<span id="cb23-2"><a href="04-Processes.html#cb23-2" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="04-Processes.html#cb23-3" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb23-4"><a href="04-Processes.html#cb23-4" tabindex="-1"></a>  <span class="ex">conda</span> params.conda_env</span>
+<span id="cb23-5"><a href="04-Processes.html#cb23-5" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+</div>
+<div id="uri-based-environment" class="section level4 hasAnchor" number="5.1.3.2">
+<h4><span class="header-section-number">5.1.3.2</span> URI based environment<a href="04-Processes.html#uri-based-environment" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>You can have nextflow install a conda packages for specific process.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb24-1"><a href="04-Processes.html#cb24-1" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb24-2"><a href="04-Processes.html#cb24-2" tabindex="-1"></a>  <span class="ex">conda</span> <span class="st">&quot;bioconda::samtools=1.20&quot;</span></span>
+<span id="cb24-3"><a href="04-Processes.html#cb24-3" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>You can find what packages can be downloaded this way through <a href="https://seqera.io/containers/">sequera containers</a>.</p>
+<p>For an easy example search for <code>bioconda::samtools</code> on the above link.</p>
+</div>
+<div id="setting-workflow-to-conda-usage" class="section level4 hasAnchor" number="5.1.3.3">
+<h4><span class="header-section-number">5.1.3.3</span> Setting workflow to conda usage<a href="04-Processes.html#setting-workflow-to-conda-usage" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>When you want to use the specified conda environments in a workflow you must either:</p>
+<p>Include <code>-with-conda</code>/<code>-use-conda</code> in the <code>nextflow run</code> command</p>
+<p>or:</p>
+<p>Better yet add <code>conda.enabled=true</code> to your <code>nextflow.config</code> file</p>
+</div>
+</div>
+</div>
+<div id="script-1" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Script<a href="04-Processes.html#script-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="variables-1" class="section level3 hasAnchor" number="5.2.1">
+<h3><span class="header-section-number">5.2.1</span> Variables<a href="04-Processes.html#variables-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Within the script nextflow variables are called as <code>${samples_id}</code>.</p>
+<p>Bash variables are called as <code>\${sample_id}</code></p>
+</div>
+<div id="other-languages" class="section level3 hasAnchor" number="5.2.2">
+<h3><span class="header-section-number">5.2.2</span> Other languages<a href="04-Processes.html#other-languages" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Other languages can be used within the nextflow script section.</p>
+<p>For example python:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb25-1"><a href="04-Processes.html#cb25-1" tabindex="-1"></a><span class="ex">script</span></span>
+<span id="cb25-2"><a href="04-Processes.html#cb25-2" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb25-3"><a href="04-Processes.html#cb25-3" tabindex="-1"></a><span class="st">#!/usr/bin/env python</span></span>
+<span id="cb25-4"><a href="04-Processes.html#cb25-4" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span></span></code></pre></div>
+</div>
+</div>
+<div id="modules" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Modules<a href="04-Processes.html#modules" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The primary <code>main.nf</code> can become quite large by having a lot of <strong>processes</strong>.
+To counteract this each process can be stored in a separate <code>main.nf</code> file.</p>
+<p>The recommendation is to store them in a directory called <code>modules/local</code> within the main workflow directory.
+Then each process would be within a <code>main.nf</code> file within various directories.</p>
+<p>A module <code>main.nf</code> would be as so:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb26-1"><a href="04-Processes.html#cb26-1" tabindex="-1"></a><span class="co">#!/usr/bin/env nextflow</span></span>
+<span id="cb26-2"><a href="04-Processes.html#cb26-2" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb26-3"><a href="04-Processes.html#cb26-3" tabindex="-1"></a>  <span class="ex">/</span> proces contents</span>
+<span id="cb26-4"><a href="04-Processes.html#cb26-4" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>Modules are imported as a process as so:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb27-1"><a href="04-Processes.html#cb27-1" tabindex="-1"></a><span class="ex">/*</span></span>
+<span id="cb27-2"><a href="04-Processes.html#cb27-2" tabindex="-1"></a> <span class="ex">*</span> Processes</span>
+<span id="cb27-3"><a href="04-Processes.html#cb27-3" tabindex="-1"></a><span class="ex">*/</span></span>
+<span id="cb27-4"><a href="04-Processes.html#cb27-4" tabindex="-1"></a><span class="ex">include</span> { FASTQC_RAW } from <span class="st">&#39;./modules/local/run/main.nf`</span></span></code></pre></div>
+<p>It is common to have subdirectories within <code>modules/local</code> grouped by tools. For example if you were performing 16S analysis with qiime2 you may have some of the following modules:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb28-1"><a href="04-Processes.html#cb28-1" tabindex="-1"></a><span class="ex">include</span> { IMPORT } from <span class="st">&#39;./modules/local/qiime2/import_data/main.nf&#39;</span></span>
+<span id="cb28-2"><a href="04-Processes.html#cb28-2" tabindex="-1"></a><span class="ex">include</span> { CUTADAPT } from <span class="st">&#39;./modules/local/qiime2/cutadpat/main.nf&#39;</span></span>
+<span id="cb28-3"><a href="04-Processes.html#cb28-3" tabindex="-1"></a><span class="ex">include</span> { DADA2 } from <span class="st">&#39;./modules/local/qiime2/dada2/main.nf&#39;</span></span></code></pre></div>
+
+</div>
 </div>
 <script>
 
@@ -443,8 +553,8 @@ window.onload = function() {
           </div>
         </div>
       </div>
-
-
+<a href="03-Channels_tuples_lists.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="05-Workflow.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

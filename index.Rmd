@@ -35,6 +35,16 @@ This is a quick and dirty guide on how I use Nextflow.
 It is primarily for my use but if someone else finds it I hope it will also proof useful. 
 Additionally, this was made with R Bookdown.
 
+## Running nextflow
+
+To run nextflow move to the directory with the `.nf` file you want to run and run:
+
+```{bash, eval=FALSE }
+nextflow run main.nf -resume
+```
+
+`-resume` is useful to keep so it does not rerun any processes that have already run. However, it can be useful to remove it if you want to test the workflow from the start.
+
 ## Contents
 
 The chapters in this bookdown include:

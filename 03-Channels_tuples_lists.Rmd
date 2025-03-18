@@ -1,0 +1,156 @@
+# Channels, tuples, & lists
+
+This section shows how to create, edit, and manipulate channels, tuples, and lists.
+
+For an explanation on these concepts please see [chapter 2](#channels_tuples_lists_concept)
+
+## Channels
+
+For more info on channels including channel operators please see the [nextflow docs](https://www.nextflow.io/docs/latest/channel.html)
+
+### Creating channels {#creating_channels}
+
+There are many ways to create various types of channels.
+
+#### Text
+
+```{bash, eval=FALSE }
+hello_ch = Channel.of("Hello","Bonjour")
+```
+
+#### Data file
+
+```{bash, eval=FALSE }
+data_ch = Channel.fromPath(params.input_file)
+```
+
+or
+
+```{bash, eval=FALSE }
+data_ch = file(params.input_file)
+```
+
+#### CSV of files
+
+```{bash, eval=FALSE }
+files_ch = Channel.fromPath(params.input_file)
+	.splitCsv()
+	.flatten()
+```
+
+#### FOFN
+
+A file containing file names sperated by lines
+
+```{bash, eval=FALSE }
+files_ch = Channel.fromPath(params.file).splitText()
+```
+
+### Extracting channels from process
+
+```{bash, eval=FALSE }
+process RUN {
+  input:
+    path(R1)
+  output:
+    path("R1_trimmed.fastq"), emit: R1_trimmed
+    path("R1_trimmed.stats.txt"), emit: R1_trimmed_stats
+}
+workflow {
+  /// Input reads from params
+  r1_ch = file(params.r1_fastq)
+  /// Run process
+  RUN(r1_ch)
+  /// Extract channels from run process
+  r1_trimmed_ch = RUN.out.R1_trimmed
+  r1_trimmed_stats_ch = RUN.out.R1_trimmed_stats
+}
+```
+
+__Note:__ You only need to extract channels form a process if they are going to be used in another process.
+
+
+## Tuples
+
+### Input & Output tuples
+
+```{bash, eval=FALSE }
+process RUN {
+input:
+  tuple val(id), path(R1), path(R2)
+output:
+	tuple val(id), path(“R1_trim.fastq”), file(“R2_trim.fastq”)
+}
+```
+
+### Transpose
+
+If you have the below channel of 3 values each containing a tuple of 2....
+
+`[[“s1”,”s1.txt”],[“s2”,”s2.txt”],[“s3”,”s3.txt”]]`
+
+and want to change it to the below channel of 1 value containing a tuple of 2, each tuple containing a list of 3....
+
+`[[“s1”,”s2”,”s3”],[“s1.txt”,”s2.txt”,”s3.txt”]]`
+
+You can run the following
+
+```{bash, eval=FALSE }
+workflow {
+  transposed_ch = id_file_pair_ch.collect(flat:false)
+                                  .map{ it.transpose()}
+}
+```
+
+This can the be called as input to a process like so:
+
+```{bash, eval=FALSE }
+process RUN {
+  input:
+    tuple val(sample_ids_list), path(files_list)
+}
+```
+
+
+## List
+
+### Channel values to one list
+
+You can collect all the values of a channel into one list.
+
+```{bash, eval=FALSE }
+workflow {
+  all_R1_fastq_ch = FASTQ.out.htmlR.collect()
+  all_R2_fastq_ch = FASTQ.out.htmlL.collect()
+}
+```
+
+This ends up with lists like
+[“S1_R1.fastqc.html”, “S2_R1.fastqc.html”]
+
+### Parameter in front of each list value
+
+Some programs accept a list of values separated by spaces.
+However, some may require a parameter flag in front of each path/file.
+This can be carried out by setting a definition in the process block.
+
+```{bash, eval=FALSE }
+process RUN {
+  input:
+  	path(all_R1_fastq)
+  
+  script:
+  def R1_fastqc_lines = all_R1_fastq.collect { 
+    fastqc -> “-F ${fastqc}”
+  }.join(‘ ‘)
+  """
+  multiqc -o multiqc $R1_fastqc_lines
+  """
+}
+```
+
+That then becomes 
+“-F S1_R1.fastqc.html -F S2_R1.fastqc.html”
+
+
+

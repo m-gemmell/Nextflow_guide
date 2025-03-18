@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Page not found | MG Nextflow Guide</title>
+  <title>Chapter 4 Channels, tuples, &amp; lists | MG Nextflow Guide</title>
   <meta name="description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Page not found | MG Nextflow Guide" />
+  <meta property="og:title" content="Chapter 4 Channels, tuples, &amp; lists | MG Nextflow Guide" />
   <meta property="og:type" content="book" />
   <meta property="og:image" content="/figures/MG_bookdown_favicon.png" />
   <meta property="og:description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Page not found | MG Nextflow Guide" />
+  <meta name="twitter:title" content="Chapter 4 Channels, tuples, &amp; lists | MG Nextflow Guide" />
   
   <meta name="twitter:description" content="NEOF book for the Introduction to command line bioinformatics workshop" />
   <meta name="twitter:image" content="/figures/MG_bookdown_favicon.png" />
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="figures/MG_bookdown_favicon.png" type="image/x-icon" />
-
-
+<link rel="prev" href="02-Basic_layout.html"/>
+<link rel="next" href="04-Processes.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -226,11 +226,121 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="page-not-found" class="section level1">
-<h1>Page not found</h1>
-<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
-<p>You may want to try searching to find the page's new location, or use
-the table of contents to find the page you are looking for.</p>
+<div id="channels-tuples-lists" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Channels, tuples, &amp; lists<a href="03-Channels_tuples_lists.html#channels-tuples-lists" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This section shows how to create, edit, and manipulate channels, tuples, and lists.</p>
+<p>For an explanation on these concepts please see <a href="01-Concepts.html#channels_tuples_lists_concept">chapter 2</a></p>
+<div id="channels-1" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Channels<a href="03-Channels_tuples_lists.html#channels-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="creating-channels" class="section level3 hasAnchor" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Creating channels<a href="03-Channels_tuples_lists.html#creating-channels" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>There are many ways to create various types of channels.</p>
+<div id="text" class="section level4 hasAnchor" number="4.1.1.1">
+<h4><span class="header-section-number">4.1.1.1</span> Text<a href="03-Channels_tuples_lists.html#text" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb7-1"><a href="03-Channels_tuples_lists.html#cb7-1" tabindex="-1"></a><span class="ex">hello_ch</span> = Channel.of<span class="er">(</span><span class="st">&quot;Hello&quot;</span><span class="ex">,</span><span class="st">&quot;Bonjour&quot;</span><span class="kw">)</span></span></code></pre></div>
+</div>
+<div id="data-file" class="section level4 hasAnchor" number="4.1.1.2">
+<h4><span class="header-section-number">4.1.1.2</span> Data file<a href="03-Channels_tuples_lists.html#data-file" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb8-1"><a href="03-Channels_tuples_lists.html#cb8-1" tabindex="-1"></a><span class="ex">data_ch</span> = Channel.fromPath<span class="er">(</span><span class="ex">params.input_file</span><span class="kw">)</span></span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb9-1"><a href="03-Channels_tuples_lists.html#cb9-1" tabindex="-1"></a><span class="ex">data_ch</span> = file<span class="er">(</span><span class="ex">params.input_file</span><span class="kw">)</span></span></code></pre></div>
+</div>
+<div id="csv-of-files" class="section level4 hasAnchor" number="4.1.1.3">
+<h4><span class="header-section-number">4.1.1.3</span> CSV of files<a href="03-Channels_tuples_lists.html#csv-of-files" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb10-1"><a href="03-Channels_tuples_lists.html#cb10-1" tabindex="-1"></a><span class="ex">files_ch</span> = Channel.fromPath<span class="er">(</span><span class="ex">params.input_file</span><span class="kw">)</span></span>
+<span id="cb10-2"><a href="03-Channels_tuples_lists.html#cb10-2" tabindex="-1"></a>    <span class="fu">.splitCsv()</span></span>
+<span id="cb10-3"><a href="03-Channels_tuples_lists.html#cb10-3" tabindex="-1"></a>    <span class="fu">.flatten()</span></span></code></pre></div>
+</div>
+<div id="fofn" class="section level4 hasAnchor" number="4.1.1.4">
+<h4><span class="header-section-number">4.1.1.4</span> FOFN<a href="03-Channels_tuples_lists.html#fofn" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>A file containing file names sperated by lines</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb11-1"><a href="03-Channels_tuples_lists.html#cb11-1" tabindex="-1"></a><span class="ex">files_ch</span> = Channel.fromPath<span class="er">(</span><span class="ex">params.file</span><span class="kw">)</span><span class="fu">.splitText()</span></span></code></pre></div>
+</div>
+</div>
+<div id="extracting-channels-from-process" class="section level3 hasAnchor" number="4.1.2">
+<h3><span class="header-section-number">4.1.2</span> Extracting channels from process<a href="03-Channels_tuples_lists.html#extracting-channels-from-process" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb12-1"><a href="03-Channels_tuples_lists.html#cb12-1" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb12-2"><a href="03-Channels_tuples_lists.html#cb12-2" tabindex="-1"></a>  <span class="ex">input:</span></span>
+<span id="cb12-3"><a href="03-Channels_tuples_lists.html#cb12-3" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="ex">R1</span><span class="kw">)</span></span>
+<span id="cb12-4"><a href="03-Channels_tuples_lists.html#cb12-4" tabindex="-1"></a>  <span class="ex">output:</span></span>
+<span id="cb12-5"><a href="03-Channels_tuples_lists.html#cb12-5" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="st">&quot;R1_trimmed.fastq&quot;</span><span class="kw">)</span><span class="ex">,</span> emit: R1_trimmed</span>
+<span id="cb12-6"><a href="03-Channels_tuples_lists.html#cb12-6" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="st">&quot;R1_trimmed.stats.txt&quot;</span><span class="kw">)</span><span class="ex">,</span> emit: R1_trimmed_stats</span>
+<span id="cb12-7"><a href="03-Channels_tuples_lists.html#cb12-7" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb12-8"><a href="03-Channels_tuples_lists.html#cb12-8" tabindex="-1"></a><span class="ex">workflow</span> {</span>
+<span id="cb12-9"><a href="03-Channels_tuples_lists.html#cb12-9" tabindex="-1"></a>  <span class="ex">///</span> Input reads from params</span>
+<span id="cb12-10"><a href="03-Channels_tuples_lists.html#cb12-10" tabindex="-1"></a>  <span class="ex">r1_ch</span> = file<span class="er">(</span><span class="ex">params.r1_fastq</span><span class="kw">)</span></span>
+<span id="cb12-11"><a href="03-Channels_tuples_lists.html#cb12-11" tabindex="-1"></a>  <span class="ex">///</span> Run process</span>
+<span id="cb12-12"><a href="03-Channels_tuples_lists.html#cb12-12" tabindex="-1"></a>  <span class="ex">RUN</span><span class="er">(</span><span class="ex">r1_ch</span><span class="kw">)</span></span>
+<span id="cb12-13"><a href="03-Channels_tuples_lists.html#cb12-13" tabindex="-1"></a>  <span class="ex">///</span> Extract channels from run process</span>
+<span id="cb12-14"><a href="03-Channels_tuples_lists.html#cb12-14" tabindex="-1"></a>  <span class="ex">r1_trimmed_ch</span> = RUN.out.R1_trimmed</span>
+<span id="cb12-15"><a href="03-Channels_tuples_lists.html#cb12-15" tabindex="-1"></a>  <span class="ex">r1_trimmed_stats_ch</span> = RUN.out.R1_trimmed_stats</span>
+<span id="cb12-16"><a href="03-Channels_tuples_lists.html#cb12-16" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p><strong>Note:</strong> You only need to extract channels form a process if they are going to be used in another process.</p>
+</div>
+</div>
+<div id="tuples-1" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Tuples<a href="03-Channels_tuples_lists.html#tuples-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="input-output-tuples" class="section level3 hasAnchor" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Input &amp; Output tuples<a href="03-Channels_tuples_lists.html#input-output-tuples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb13-1"><a href="03-Channels_tuples_lists.html#cb13-1" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb13-2"><a href="03-Channels_tuples_lists.html#cb13-2" tabindex="-1"></a><span class="ex">input:</span></span>
+<span id="cb13-3"><a href="03-Channels_tuples_lists.html#cb13-3" tabindex="-1"></a>  <span class="ex">tuple</span> val<span class="er">(</span><span class="fu">id</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="ex">R1</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="ex">R2</span><span class="kw">)</span></span>
+<span id="cb13-4"><a href="03-Channels_tuples_lists.html#cb13-4" tabindex="-1"></a><span class="ex">output:</span></span>
+<span id="cb13-5"><a href="03-Channels_tuples_lists.html#cb13-5" tabindex="-1"></a>    <span class="ex">tuple</span> val<span class="er">(</span><span class="fu">id</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="ex">“R1_trim.fastq”</span><span class="kw">)</span><span class="ex">,</span> file<span class="er">(</span><span class="ex">“R2_trim.fastq”</span><span class="kw">)</span></span>
+<span id="cb13-6"><a href="03-Channels_tuples_lists.html#cb13-6" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+</div>
+<div id="transpose" class="section level3 hasAnchor" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Transpose<a href="03-Channels_tuples_lists.html#transpose" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>If you have the below channel of 3 values each containing a tuple of 2....</p>
+<p><code>[[“s1”,”s1.txt”],[“s2”,”s2.txt”],[“s3”,”s3.txt”]]</code></p>
+<p>and want to change it to the below channel of 1 value containing a tuple of 2, each tuple containing a list of 3....</p>
+<p><code>[[“s1”,”s2”,”s3”],[“s1.txt”,”s2.txt”,”s3.txt”]]</code></p>
+<p>You can run the following</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb14-1"><a href="03-Channels_tuples_lists.html#cb14-1" tabindex="-1"></a><span class="ex">workflow</span> {</span>
+<span id="cb14-2"><a href="03-Channels_tuples_lists.html#cb14-2" tabindex="-1"></a>  <span class="ex">transposed_ch</span> = id_file_pair_ch.collect<span class="er">(</span><span class="ex">flat:false</span><span class="kw">)</span></span>
+<span id="cb14-3"><a href="03-Channels_tuples_lists.html#cb14-3" tabindex="-1"></a>                                  <span class="ex">.map{</span> it.transpose<span class="er">(</span><span class="kw">)</span><span class="er">}</span></span>
+<span id="cb14-4"><a href="03-Channels_tuples_lists.html#cb14-4" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>This can the be called as input to a process like so:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb15-1"><a href="03-Channels_tuples_lists.html#cb15-1" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb15-2"><a href="03-Channels_tuples_lists.html#cb15-2" tabindex="-1"></a>  <span class="ex">input:</span></span>
+<span id="cb15-3"><a href="03-Channels_tuples_lists.html#cb15-3" tabindex="-1"></a>    <span class="ex">tuple</span> val<span class="er">(</span><span class="ex">sample_ids_list</span><span class="kw">)</span><span class="ex">,</span> path<span class="er">(</span><span class="ex">files_list</span><span class="kw">)</span></span>
+<span id="cb15-4"><a href="03-Channels_tuples_lists.html#cb15-4" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+</div>
+</div>
+<div id="list" class="section level2 hasAnchor" number="4.3">
+<h2><span class="header-section-number">4.3</span> List<a href="03-Channels_tuples_lists.html#list" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="channel-values-to-one-list" class="section level3 hasAnchor" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> Channel values to one list<a href="03-Channels_tuples_lists.html#channel-values-to-one-list" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>You can collect all the values of a channel into one list.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb16-1"><a href="03-Channels_tuples_lists.html#cb16-1" tabindex="-1"></a><span class="ex">workflow</span> {</span>
+<span id="cb16-2"><a href="03-Channels_tuples_lists.html#cb16-2" tabindex="-1"></a>  <span class="ex">all_R1_fastq_ch</span> = FASTQ.out.htmlR.collect<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb16-3"><a href="03-Channels_tuples_lists.html#cb16-3" tabindex="-1"></a>  <span class="ex">all_R2_fastq_ch</span> = FASTQ.out.htmlL.collect<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb16-4"><a href="03-Channels_tuples_lists.html#cb16-4" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>This ends up with lists like
+[“S1_R1.fastqc.html”, “S2_R1.fastqc.html”]</p>
+</div>
+<div id="parameter-in-front-of-each-list-value" class="section level3 hasAnchor" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> Parameter in front of each list value<a href="03-Channels_tuples_lists.html#parameter-in-front-of-each-list-value" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Some programs accept a list of values separated by spaces.
+However, some may require a parameter flag in front of each path/file.
+This can be carried out by setting a definition in the process block.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash Rchunk"><code class="sourceCode bash"><span id="cb17-1"><a href="03-Channels_tuples_lists.html#cb17-1" tabindex="-1"></a><span class="ex">process</span> RUN {</span>
+<span id="cb17-2"><a href="03-Channels_tuples_lists.html#cb17-2" tabindex="-1"></a>  <span class="ex">input:</span></span>
+<span id="cb17-3"><a href="03-Channels_tuples_lists.html#cb17-3" tabindex="-1"></a>    <span class="ex">path</span><span class="er">(</span><span class="ex">all_R1_fastq</span><span class="kw">)</span></span>
+<span id="cb17-4"><a href="03-Channels_tuples_lists.html#cb17-4" tabindex="-1"></a>  </span>
+<span id="cb17-5"><a href="03-Channels_tuples_lists.html#cb17-5" tabindex="-1"></a>  <span class="ex">script:</span></span>
+<span id="cb17-6"><a href="03-Channels_tuples_lists.html#cb17-6" tabindex="-1"></a>  <span class="ex">def</span> R1_fastqc_lines = all_R1_fastq.collect { </span>
+<span id="cb17-7"><a href="03-Channels_tuples_lists.html#cb17-7" tabindex="-1"></a>    <span class="ex">fastqc</span> <span class="at">-</span><span class="op">&gt;</span> “-F <span class="va">${fastqc}</span>”</span>
+<span id="cb17-8"><a href="03-Channels_tuples_lists.html#cb17-8" tabindex="-1"></a>  <span class="er">}</span><span class="ex">.join</span><span class="er">(</span><span class="ex">‘</span> ‘<span class="kw">)</span></span>
+<span id="cb17-9"><a href="03-Channels_tuples_lists.html#cb17-9" tabindex="-1"></a>  <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb17-10"><a href="03-Channels_tuples_lists.html#cb17-10" tabindex="-1"></a><span class="st">  multiqc -o multiqc </span><span class="va">$R1_fastqc_lines</span></span>
+<span id="cb17-11"><a href="03-Channels_tuples_lists.html#cb17-11" tabindex="-1"></a><span class="st">  &quot;&quot;&quot;</span></span>
+<span id="cb17-12"><a href="03-Channels_tuples_lists.html#cb17-12" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>That then becomes
+“-F S1_R1.fastqc.html -F S2_R1.fastqc.html”</p>
+
+</div>
+</div>
 </div>
 <script>
 
@@ -443,8 +553,8 @@ window.onload = function() {
           </div>
         </div>
       </div>
-
-
+<a href="02-Basic_layout.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="04-Processes.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -1,0 +1,6 @@
+# Workflow
+
+This section includes some extra features related to __processes__.
+
+A full link of workflow info can be seen in the [nextflow docs](https://www.nextflow.io/docs/latest/workflow.html)
+

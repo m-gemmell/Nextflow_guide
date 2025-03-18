@@ -59,7 +59,7 @@ __Variable__ names cannot start with numbers.
 
 Bash __variables__ within a `script` section must be denoted by a `\` (e.g. `\$var`).
 
-## Channels, tuples, & lists
+## Channels, tuples, & lists {#channels_tuples_lists_concept}
 
 __Channels__, __tuples__, and __lists__ are objects that contain multiple objects but work in different ways.
 

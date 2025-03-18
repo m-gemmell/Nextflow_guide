@@ -38,6 +38,16 @@ This is a quick and dirty guide on how I use Nextflow.
 It is primarily for my use but if someone else finds it I hope it will also proof useful. 
 Additionally, this was made with R Bookdown.
 
+## Running nextflow
+
+To run nextflow move to the directory with the `.nf` file you want to run and run:
+
+```{bash, eval=FALSE }
+nextflow run main.nf -resume
+```
+
+`-resume` is useful to keep so it does not rerun any processes that have already run. However, it can be useful to remove it if you want to test the workflow from the start.
+
 ## Contents
 
 The chapters in this bookdown include:
@@ -117,7 +127,7 @@ __Variable__ names cannot start with numbers.
 
 Bash __variables__ within a `script` section must be denoted by a `\` (e.g. `\$var`).
 
-## Channels, tuples, & lists
+## Channels, tuples, & lists {#channels_tuples_lists_concept}
 
 __Channels__, __tuples__, and __lists__ are objects that contain multiple objects but work in different ways.
 
@@ -300,7 +310,7 @@ However some suggestions are:
 - Separate words with `_`.
 - Ensure all process names are unique and somewhat descriptive within your workflow.
 
-### publishDir
+### publishDir {#basic_publishdir}
 
 All files created by the __Process__ will be contained with the workflow's `work` directory (more info later).
 All files specified in the `output` section will be stored in the directory specified by `publishDir`, if the directory does not exist Nextflow will create it.
@@ -343,5 +353,357 @@ Input variables can be denoted by a `$` and output variables are written like no
 ## workflow
 The workflow section is where all the other sections come together so the workflow knows how to utilise them.
 
-<!--chapter:end:02-Basic_loytout.Rmd-->
+<!--chapter:end:02-Basic_layout.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+library(webexercises)
+```
+# Channels, tuples, & lists
+
+This section shows how to create, edit, and manipulate channels, tuples, and lists.
+
+For an explanation on these concepts please see [chapter 2](#channels_tuples_lists_concept)
+
+## Channels
+
+### Creating channels
+
+There are many ways to create various types of channels.
+
+#### Text
+
+```{bash, eval=FALSE }
+hello_ch = Channel.of("Hello","Bonjour")
+```
+
+#### Data file
+
+```{bash, eval=FALSE }
+data_ch = Channel.fromPath(params.input_file)
+```
+
+or
+
+```{bash, eval=FALSE }
+data_ch = file(params.input_file)
+```
+
+#### CSV of files
+
+```{bash, eval=FALSE }
+files_ch = Channel.fromPath(params.input_file)
+	.splitCsv()
+	.flatten()
+```
+
+#### FOFN
+
+A file containing file names sperated by lines
+
+```{bash, eval=FALSE }
+files_ch = Channel.fromPath(params.file).splitText()
+```
+
+### Extracting channels from process
+
+```{bash, eval=FALSE }
+process RUN {
+  input:
+    path(R1)
+  output:
+    path("R1_trimmed.fastq"), emit: R1_trimmed
+    path("R1_trimmed.stats.txt"), emit: R1_trimmed_stats
+}
+workflow {
+  /// Input reads from params
+  r1_ch = file(params.r1_fastq)
+  /// Run process
+  RUN(r1_ch)
+  /// Extract channels from run process
+  r1_trimmed_ch = RUN.out.R1_trimmed
+  r1_trimmed_stats_ch = RUN.out.R1_trimmed_stats
+}
+```
+
+__Note:__ You only need to extract channels form a process if they are going to be used in another process.
+
+
+## Tuples
+
+### Input & Output tuples
+
+```{bash, eval=FALSE }
+process RUN {
+input:
+  tuple val(id), path(R1), path(R2)
+output:
+	tuple val(id), path(“R1_trim.fastq”), file(“R2_trim.fastq”)
+}
+```
+
+### Transpose
+
+If you have the below channel of 3 values each containing a tuple of 2....
+
+`[[“s1”,”s1.txt”],[“s2”,”s2.txt”],[“s3”,”s3.txt”]]`
+
+and want to change it to the below channel of 1 value containing a tuple of 2, each tuple containing a list of 3....
+
+`[[“s1”,”s2”,”s3”],[“s1.txt”,”s2.txt”,”s3.txt”]]`
+
+You can run the following
+
+```{bash, eval=FALSE }
+workflow {
+  transposed_ch = id_file_pair_ch.collect(flat:false)
+                                  .map{ it.transpose()}
+}
+```
+
+This can the be called as input to a process like so:
+
+```{bash, eval=FALSE }
+process RUN {
+  input:
+    tuple val(sample_ids_list), path(files_list)
+}
+```
+
+
+## List
+
+### Channel values to one list
+
+You can collect all the values of a channel into one list.
+
+```{bash, eval=FALSE }
+workflow {
+  all_R1_fastq_ch = FASTQ.out.htmlR.collect()
+  all_R2_fastq_ch = FASTQ.out.htmlL.collect()
+}
+```
+
+This ends up with lists like
+[“S1_R1.fastqc.html”, “S2_R1.fastqc.html”]
+
+### Parameter in front of each list value
+
+Some programs accept a list of values separated by spaces.
+However, some may require a parameter flag in front of each path/file.
+This can be carried out by setting a definition in the process block.
+
+```{bash, eval=FALSE }
+process RUN {
+  input:
+  	path(all_R1_fastq)
+  
+  script:
+  def R1_fastqc_lines = all_R1_fastq.collect { 
+    fastqc -> “-F ${fastqc}”
+  }.join(‘ ‘)
+  """
+  multiqc -o multiqc $R1_fastqc_lines
+  """
+}
+```
+
+That then becomes 
+“-F S1_R1.fastqc.html -F S2_R1.fastqc.html”
+
+
+
+
+<!--chapter:end:03-Channels_tuples_lists.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+library(webexercises)
+```
+# Processes
+
+This section includes some extra features related to __processes__.
+
+A full link of process info can be seen in the [nextflow docs](https://www.nextflow.io/docs/latest/reference/process.html)
+
+## Directives
+
+You can include directives in each process. These can be used to specify the execution requirements of a process.
+
+### cpus
+
+One example is that you can use `cpus` to specify the number of cpus to be used by a process.
+
+```{bash, eval=FALSE }
+process RUN {
+  cpus 2
+}
+```
+
+### publishDir
+
+The basics of [pblishDir](#basic_publishdir)
+
+My preferred method is to assign an overall output/results directory as a params.
+
+```{bash, eval=FALSE }
+params.outdir="./results"
+
+process RUN {
+  publishDir params.outdir, mode: 'copy'
+}
+```
+
+You can also set a subdiretcory of the output directory in the process.
+
+```{bash, eval=FALSE }
+params.outdir="./results"
+
+process RUN {
+  publishDir {
+    "${params.outdir}/stage_1"
+    }, mode: 'copy'
+}
+```
+
+You can even do this with input variables.
+
+```{bash, eval=FALSE }
+params.outdir="./results"
+input:
+  val sample_id
+process RUN {
+  publishDir {
+    "${params.outdir}/stage_1/${sample_id}"
+    }, mode: 'copy'
+}
+```
+
+### conda
+
+A conda environment can be specified.
+
+Further info on using [conda environments](https://www.nextflow.io/docs/latest/conda.html#conda-page)
+
+#### Local environment
+
+You can specify a conda environment you have locally created.
+
+```{bash, eval=FALSE }
+process RUN {
+  conda "/home/minforge3/envs/run_env"
+}
+```
+
+If using a locally installed env it is best to specify it as a params to make it quicker to add.edit for multiple processes.
+
+```{bash, eval=FALSE }
+params.conda_env="/home/minforge3/envs/run_env"
+
+process RUN {
+  conda params.conda_env
+}
+```
+
+#### URI based environment
+
+You can have nextflow install a conda packages for specific process.
+
+```{bash, eval=FALSE }
+process RUN {
+  conda "bioconda::samtools=1.20"
+}
+```
+
+You can find what packages can be downloaded this way through [sequera containers](https://seqera.io/containers/).
+
+For an easy example search for `bioconda::samtools` on the above link.
+
+#### Setting workflow to conda usage
+
+When you want to use the specified conda environments in a workflow you must either:
+
+Include `-with-conda`/`-use-conda` in the `nextflow run` command
+
+or:
+
+Better yet add `conda.enabled=true` to your `nextflow.config` file
+
+## Script
+
+### Variables
+
+Within the script nextflow variables are called as `${samples_id}`.
+
+Bash variables are called as `\${sample_id}`
+
+### Other languages
+
+Other languages can be used within the nextflow script section.
+
+For example python:
+
+```{bash, eval=FALSE }
+script
+"""
+#!/usr/bin/env python
+"""
+```
+
+## Modules
+
+The primary `main.nf` can become quite large by having a lot of __processes__.
+To counteract this each process can be stored in a separate `main.nf` file.
+
+The recommendation is to store them in a directory called `modules/local` within the main workflow directory.
+Then each process would be within a `main.nf` file within various directories.
+
+A module `main.nf` would be as so:
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+process RUN {
+  / proces contents
+}
+```
+
+Modules are imported as a process as so:
+
+```{bash, eval=FALSE }
+/*
+ * Processes
+*/
+include { FASTQC_RAW } from './modules/local/run/main.nf`
+```
+
+It is common to have subdirectories within `modules/local` grouped by tools. For example if you were performing 16S analysis with qiime2 you may have some of the following modules:
+
+```{bash, eval=FALSE }
+include { IMPORT } from './modules/local/qiime2/import_data/main.nf'
+include { CUTADAPT } from './modules/local/qiime2/cutadpat/main.nf'
+include { DADA2 } from './modules/local/qiime2/dada2/main.nf'
+```
+
+<!--chapter:end:04-Processes.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+library(webexercises)
+```
+# Workflow
+
+This section includes some extra features related to __processes__.
+
+A full link of workflow info can be seen in the [nextflow docs](https://www.nextflow.io/docs/latest/workflow.html)
+
+
+<!--chapter:end:05-Workflow.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+library(webexercises)
+```
+# Params and config
+
+This section includes some extra features related to __params__ and the __config__ file.
+
+A full link of config info can be seen in the [nextflow docs](https://www.nextflow.io/docs/latest/config.html)
+
+<!--chapter:end:06-Params_and_config.Rmd-->
 

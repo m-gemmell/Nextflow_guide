@@ -93,7 +93,7 @@ However some suggestions are:
 - Separate words with `_`.
 - Ensure all process names are unique and somewhat descriptive within your workflow.
 
-### publishDir
+### publishDir {#basic_publishdir}
 
 All files created by the __Process__ will be contained with the workflow's `work` directory (more info later).
 All files specified in the `output` section will be stored in the directory specified by `publishDir`, if the directory does not exist Nextflow will create it.
