@@ -15,7 +15,9 @@ There are many ways to create various types of channels.
 #### Text
 
 ```{bash, eval=FALSE }
-hello_ch = Channel.of("Hello","Bonjour")
+workflow {
+  hello_ch = Channel.of("Hello","Bonjour")
+}
 ```
 
 #### Data file
@@ -27,15 +29,19 @@ data_ch = Channel.fromPath(params.input_file)
 or
 
 ```{bash, eval=FALSE }
-data_ch = file(params.input_file)
+workflow {
+  data_ch = file(params.input_file)
+}
 ```
 
 #### CSV of files
 
 ```{bash, eval=FALSE }
-files_ch = Channel.fromPath(params.input_file)
-	.splitCsv()
-	.flatten()
+workflow {
+  files_ch = Channel.fromPath(params.input_file)
+	  .splitCsv()
+	  .flatten()
+}
 ```
 
 #### FOFN
@@ -43,8 +49,59 @@ files_ch = Channel.fromPath(params.input_file)
 A file containing file names sperated by lines
 
 ```{bash, eval=FALSE }
-files_ch = Channel.fromPath(params.file).splitText()
+workflow {
+  files_ch = Channel.fromPath(params.file).splitText()
+}
 ```
+
+#### Paired files
+
+Useful for paired illumina fastq files.
+
+```{bash, eval=FALSE }
+params.reads = "/path_to_fastq_dir/*_R{1,2}.fastq"
+workflow {
+  Channel
+    .fromFilePairs(params.reads, checkIfExists: true)
+    .set {read_pairs_ch}
+}
+```
+
+This creates a channel of multiple values based on the number of paired files. Each channel value has contains a tuple of 2 values:
+
+- First is a text value of the file prefix. The file prefix is the text that the `*` reprsents in the params.reads path.
+- The second is a list with the first value is the R1 file and the second value is the R2 file.
+
+For example if you had the files:
+
+- S1_R1.fastq
+- S1_R2.fastq
+
+The tuple would be:
+
+`["S1",["S1_R1.fastq","S1_R2.fastq]]`
+
+You could then use this channel like so:
+
+```{bash, eval=FALSE }
+params.reads = "/path_to_fastq_dir/*_R{1,2}.fastq"
+process RUN {
+  input:
+    tuple val(sample_id), path(reads)
+  script:
+  """
+  command -s ${sample_id} -r1 ${reads[0]} -r2 ${reads[1]}
+  """
+}
+workflow {
+  Channel
+    .fromFilePairs(params.reads, checkIfExists: true)
+    .set {read_pairs_ch}
+  RUN(read_pairs_ch)
+}
+```
+
+__Note:__ Indexing a list starts at 0 (`-r1 ${reads[0]}`)
 
 ### Extracting channels from process
 
@@ -120,8 +177,8 @@ You can collect all the values of a channel into one list.
 
 ```{bash, eval=FALSE }
 workflow {
-  all_R1_fastq_ch = FASTQ.out.htmlR.collect()
-  all_R2_fastq_ch = FASTQ.out.htmlL.collect()
+  all_R1_fastq_ch = FASTQC.out.htmlR.collect()
+  all_R2_fastq_ch = FASTQC.out.htmlL.collect()
 }
 ```
 
@@ -150,7 +207,7 @@ process RUN {
 ```
 
 That then becomes 
-“-F S1_R1.fastqc.html -F S2_R1.fastqc.html”
+`“-F S1_R1.fastqc.html -F S2_R1.fastqc.html”`
 
 
 

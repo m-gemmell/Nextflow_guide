@@ -4,9 +4,11 @@ This section includes some extra features related to __processes__.
 
 A full link of process info can be seen in the [nextflow docs](https://www.nextflow.io/docs/latest/reference/process.html)
 
-## Directives
+## Directives {#process_directives}
 
 You can include directives in each process. These can be used to specify the execution requirements of a process.
+
+[Link to full list of process directives](https://www.nextflow.io/docs/latest/reference/process.html#directives)
 
 ### cpus
 

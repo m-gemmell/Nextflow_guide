@@ -31,9 +31,7 @@ workflow {
 }
 ```
 
-More info/examples in [Creating channels]{#creating_channels}
-
-###
+More info/examples in [Creating channels](#creating_channels)
 
 ## Config
 
@@ -41,6 +39,20 @@ You can contain a lot of info in a config file.
 
 Your primary config file should be in the same directory as your primary `main.nf` file and should be named `nextflow.config`.
 This will cause it to be used when you `nextflow run main.nf -resume`.
+
+[Link to nextflow configuration doc](https://www.nextflow.io/docs/latest/config.html)
+
+### Process directives
+
+For [Process directives](#process_directives) you want to be the default of all processes in your workflow you can include them in your `nextflow.config`.
+
+```{bash, eval=FALSE }
+process {
+  memory = 100.00GB
+  cups = 8
+  time = 30.d
+}
+```
 
 ### Params in config
 
@@ -58,5 +70,67 @@ params {
 }
 ```
 
-Ensure you still use `params.` as a prefux in the various `.nf` files.
+Ensure you still use `params.` as a prefix in the various `.nf` files.
+
+### Conda
+
+Rather than needing to include `-use-conda` in your command line you can add the below to your `nextflow.config` to make your workflow use conda.
+
+```{bash, eval=FALSE }
+conda.enabled = true
+```
+
+### Container program
+
+There are many different container programs. Below are what you can add to the `nextflow.config` to get the different ones to work.
+
+This includes setting the path to the image (if using one) and enabling the specific container program.
+
+```{bash, eval=FALSE }
+/// Docker
+process.container = 'nextflow/examples:latest'
+docker.enabled = true
+```
+
+```{bash, eval=FALSE }
+/// Singularity
+process.container = '/path/to/singularity.img'
+singularity.enabled = true
+```
+
+If using one of them ensure you specify the containers in the variosu processes.
+
+[Link to container nextflow docs](https://www.nextflow.io/docs/latest/container.html)
+
+### Config profiles
+
+
+You can have multiple profiles in a `nextflow.config` file.
+
+To use a profile you would run:
+
+```{bash, eval=FALSE }
+nextflow run main.nf -profile laptop
+```
+
+To make different profiles you could include the below in your `nextflow.config`.
+
+```{bash, eval=FALSE }
+profiles {
+    laptop {
+        process.executor = 'local'
+        docker.enabled = true
+    }
+    hpc {
+        process.executor = 'slurm'
+        conda.enabled = true
+        process.resourceLimits = [
+            memory: 750.GB,
+            cpus: 200,
+            time: 30.d
+        ]
+    }
+}
+```
+
 
