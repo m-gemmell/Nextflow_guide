@@ -1,3 +1,4 @@
+# (PART\*) Components {-}
 # Basic layout
 
 When using Nextflow each project should be within its own directory.

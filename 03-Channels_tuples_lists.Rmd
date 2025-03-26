@@ -126,6 +126,17 @@ workflow {
 
 __Note:__ You only need to extract channels form a process if they are going to be used in another process.
 
+### View
+
+You can view a channel's content and structure by including `.view` and running the workflow (`nextflow run main.nf`).
+
+```{bash, eval=FALSE }
+workflow {
+  /// Input reads from params
+  r1_ch = file(params.r1_fastq).view
+}
+```
+
 
 ## Tuples
 

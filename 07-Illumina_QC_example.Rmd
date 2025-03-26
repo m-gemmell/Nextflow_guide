@@ -1,0 +1,257 @@
+# (PART\*) Example workflows {-}
+# Illumina QC example
+
+This chapter contains an example nextflow wrokflow for a simple QC of paired Illumina data.
+
+In this example `./` represents the main project/workflow directory.
+
+It will use a locally installed conda env.
+
+## main.nf
+
+The main nextflow file.
+
+Path: `./main.nf`
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+
+/*
+ * Workflow for basic Paired end Illumina QC
+*/
+
+/ Params in nextflow.config
+
+/Text that will be printed at start of work flow to terminal
+log.info """\
+  ILLUMINA QC
+  ===========
+  raw reads: ${params.reads}
+  out_dir: ${params.outdir}
+  """
+  .stripIndent()
+  
+/*
+* Processes
+* All within module files
+*/
+
+include { FASTQC_RAW } from './modules/local/fastqc/raw/main.nf'
+include { MULTIQC_RAW } from './modules/local/multiqc/raw/main.nf' 
+include { TRIMMOMATIC } from './modules/local/trimmomatic/main.nf' 
+include { FASTQC_TRIM } from './modules/local/fastqc/trim/main.nf'
+include { MULTIQC_TRIM } from './modules/local/multiqc/trim/main.nf'
+
+/*
+* Workflow
+*/
+  /// Read in fastq data into channel
+  Channel
+    .fromFilePairs(params.reads, checkIfExists: true)
+    .set {read_pairs_ch}
+  /// raw fastqc
+  FASTQC_RAW(read_pairs_ch)
+  /// raw fastqc zip output
+  raw_fastqc_zip_ch=FASTQC_RAW.out.zip
+  /// Transform so channel of 1 value which is a tuple
+  /// all R1 in one list and all R2 in one list
+  raw_fastqc_zip_split_by_r1r2_ch = raw_fastqc_zip_ch.collect(flat:false)
+                                                      .map{it.transpose()}
+  /// raw multiqc of fastqc
+  MULTIQC_RAW(raw_fastqc_zip_split_by_r1r2_ch)
+  /// trimmomatic
+  TRIMMOMATIC(read_pairs_ch)
+  /// trimmomatic fastqc
+  FASTQC_TRIM(TRIMMOMATIC.out)
+  /// trim fastqc zip output
+  trim_fastqc_zip_ch=FASTQC_RAW.out.zip
+  /// Transform so channel of 1 value which is a tuple
+  /// all R1 in one list and all R2 in one list
+  trim_fastqc_zip_split_by_r1r2_ch = trim_fastqc_zip_ch.collect(flat:false)
+                                                      .map{it.transpose()}
+  /// trimmomatic_multiqc
+  MULTIQC_TRIM(trim_fastqc_zip_split_by_r1r2_ch)
+```
+
+## nextflow.config
+
+The main confg file.
+
+Path: `./nextflow.config`
+
+```{bash, eval=FALSE }
+conda.enabled = true
+
+params {
+  dir = "."
+  outdir = "./results"
+  reads = "/home/data/project123/fastqs/*_R{1,2}.fastq"
+  conda_env = "/home/conda/envs/example_env"
+}
+
+process {
+  memory = 100.00GB
+  cups = 8
+  time = 30.d
+}
+```
+
+## Modules
+
+The processes are each in their own separate files/modules.
+
+### FASTQC_RAW
+
+Path: `./modules/local/fastqc/raw/main.nf`
+
+__Note:__ how in this case the `publishDir` directive is used to create the output directory where the fastqc files will be located.
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+process FASTQC_RAW {
+  conda params.conda_env
+  
+  publishDir {
+    "${params.outdir}/raw_fastqc_output"
+    }, mode:'copy'
+  
+  input:
+    tuple val(sample_id), path(reads)
+    
+  output:
+    tuple path("./${sample_id}_R1_fastqc.html"),
+      path("./${sample_id}_R2_fastqc.html"), emit: html
+    tuple path("./${sample_id}_R1_fastqc.zip"),
+      path("./${sample_id}_R2_fastqc.zip"), emit: zip
+  script:
+  """
+  fastqc -o ./ ${reads[0]} ${reads[1]}
+  """
+}
+```
+
+### MULTIQC_RAW
+
+Path: `./modules/local/multiqc/raw/main.nf`
+
+Output is simple as we don't need to use it in the workflow as it is part of the final output.
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+process MULTIQC_RAW {
+  conda params.conda_env
+  
+  publishDir {
+    "${params.outdir}/raw_multiqc_output"
+    }, mode:'copy'
+  
+  input:
+    tuple path(r1_zip), path(r2_zip)
+    
+  output:
+    path "./r{1,2}/multiqc_report.html"
+  
+  script:
+  """
+  #R1
+  mkdir r1
+  multiqc -o r1 $r1_zip
+  #R2
+  mkdir r2
+  multiqc -o r2 $r2_zip
+  """
+}
+```
+
+### TRIMMOMATIC
+
+Path: `./modules/local/trimmomatic/main.nf`
+
+Trimmomatic creates:
+
+- __P files:__ Paired reads that retained both pairs.
+- __U files:__ Reads that are unpaired as their paired read was removed by the filtering. These are generally not used for most processes.
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+process TRIMMOMATIC {
+  conda params.conda_env
+  
+  publishDir params.outdir, mode:'copy'
+  
+  input:
+    tuple path(sample_id), path(reads)
+    
+  output:
+    tuple val(sample_id), path("${sample_id}_{1,2}P.fastq"), path("${sample_id}_{1,2}U.fastq")
+  
+  script:
+  """
+  trimmomatic PE -phred33 \
+  ${reads[0]} ${reads[1]} \
+  -baseout ${sample_id}.fastq \
+  SLIDINGWINDOW:4:20 MINLEN:50
+  """
+}
+```
+
+### FASTQC_TRIM
+
+Path: `./modules/local/fastqc/trim/main.nf`
+
+Only using fastqc on the __P__ files as we are not interested in the __U__ files.
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+process FASTQC_TRIM {
+  conda params.conda_env
+  
+  publishDir {
+    "${params.outdir}/trim_fastqc_output"
+    }, mode:'copy'
+  
+  input:
+    tuple val(sample_id), path(trim_p_reads), path(trim_u_reads)
+    
+  output:
+    tuple path("./${sample_id}_1P_fastqc.html"),
+      path("./${sample_id}_2P_fastqc.html"), emit: html
+    tuple path("./${sample_id}_2P_fastqc.zip"),
+      path("./${sample_id}_2P_fastqc.zip"), emit: html
+  script:
+  """
+  fastqc -o ./ ${trim_p_reads[0]} ${trim_p_reads[1]}
+  """
+}
+```
+
+### MULTIQC_TRIM
+
+Path: `./modules/local/multiqc/trim/main.nf`
+
+```{bash, eval=FALSE }
+#!/usr/bin/env nextflow
+process MULTIQC_TRIM {
+  conda params.conda_env
+  
+  publishDir {
+    "${params.outdir}/trim_multiqc_output"
+    }, mode:'copy'
+  
+  input:
+    tuple path(r1_zip), path(r2_zip)
+    
+  output:
+    path "./r{1,2}/multiqc_report.html"
+  
+  script:
+  """
+  #R1
+  mkdir r1
+  multiqc -o r1 $r1_zip
+  #R2
+  mkdir r2
+  multiqc -o r2 $r2_zip
+  """
+}
+```
